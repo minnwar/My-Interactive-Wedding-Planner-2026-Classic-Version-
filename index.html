@@ -1,0 +1,3171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Wedding Planner</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#1A1A2E;
+  --accent-light:rgba(26,26,46,0.08);
+  --accent-dark:rgba(26,26,46,0.9);
+  --bg:#F7F8FA;
+  --card:#FFFFFF;
+  --border:#E4E4E7;
+  --text:#1A1A2E;
+  --muted:#71717A;
+  --green:#22C55E;
+  --red:#EF4444;
+  --orange:#F59E0B;
+  --yellow:#EAB308;
+  --sidebar-w:260px;
+  --topbar-h:60px;
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.5;overflow-x:hidden;
+}
+h1,h2,h3,h4{font-weight:700;line-height:1.2}
+h1{font-size:clamp(1.5rem,3vw,2rem)}
+h2{font-size:clamp(1.2rem,2.5vw,1.5rem)}
+h3{font-size:clamp(1rem,2vw,1.2rem)}
+p{color:var(--muted);font-size:clamp(0.85rem,1.5vw,0.95rem)}
+a{color:var(--accent);text-decoration:none}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+input,select,textarea{font-family:inherit;font-size:inherit;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-light)}
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:clamp(16px,2vw,24px);
+}
+.badge{
+  display:inline-block;padding:2px 10px;border-radius:999px;font-size:0.75rem;
+  font-weight:600;text-transform:uppercase;letter-spacing:0.3px;
+}
+.badge-pending{background:#F3F4F6;color:#6B7280}
+.badge-attending{background:rgba(34,197,94,0.15);color:#16A34A}
+.badge-declined{background:rgba(239,68,68,0.12);color:#DC2626}
+.badge-maybe{background:rgba(234,179,8,0.15);color:#CA8A04}
+.badge-bridesmaid,.badge-groomsman,.badge-guest,.badge-family,.badge-officiant{
+  background:var(--accent-light);color:var(--accent-dark);
+}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;
+  font-weight:600;font-size:0.9rem;transition:all 0.2s;
+}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-outline{background:transparent;border:2px solid var(--accent);color:var(--accent)}
+.btn-outline:hover{background:var(--accent-light)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{filter:brightness(1.1)}
+.btn-sm{padding:5px 12px;font-size:0.8rem}
+.btn-icon{background:none;color:var(--muted);padding:4px 6px;border-radius:6px}
+.btn-icon:hover{background:var(--accent-light);color:var(--accent)}
+.progress-bar{
+  width:100%;height:8px;background:#F3F4F6;border-radius:999px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;border-radius:999px;background:var(--accent);transition:width 0.4s ease;
+}
+.progress-fill.red{background:var(--red)}
+input[type="text"],input[type="number"],input[type="date"],input[type="email"],input[type="tel"],select,textarea{
+  width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;
+  background:var(--card);color:var(--text);font-size:0.9rem;
+}
+textarea{resize:vertical;min-height:60px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-weight:600;font-size:0.85rem;margin-bottom:6px;color:var(--text)}
+.form-error{color:var(--red);font-size:0.8rem;margin-top:4px;display:none}
+.form-error.show{display:block}
+.checkbox-label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.9rem}
+.checkbox-label input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);border-bottom:1px solid var(--border);font-weight:600}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:0.9rem;vertical-align:middle}
+tr:hover td{background:rgba(0,0,0,0.015)}
+
+/* WELCOME */
+#welcome{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#F7F8FA 0%,#EEF0F5 100%);padding:20px;
+}
+.welcome-card{
+  position:relative;background:var(--card);border-radius:20px;padding:clamp(24px,4vw,48px);
+  box-shadow:0 8px 40px rgba(0,0,0,0.1);max-width:520px;width:100%;overflow:hidden;z-index:1;
+}
+.welcome-circle{
+  position:absolute;border-radius:50%;pointer-events:none;
+}
+.welcome-circle.c1{width:300px;height:300px;top:-100px;right:-80px;background:var(--accent-light)}
+.welcome-circle.c2{width:200px;height:200px;bottom:-60px;left:-60px;background:rgba(232,180,184,0.12)}
+.welcome-circle.c3{width:150px;height:150px;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(156,175,136,0.1)}
+.welcome-title{text-align:center;font-size:clamp(1.5rem,4vw,2rem);margin-bottom:4px}
+.welcome-sub{text-align:center;color:var(--muted);margin-bottom:28px;font-size:0.95rem}
+.welcome-section{margin-bottom:20px}
+.welcome-section h3{margin-bottom:10px;font-size:0.95rem}
+.input-group{display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
+.input-group .prefix{padding:10px 12px;background:#F9FAFB;color:var(--muted);font-size:0.9rem;border-right:1px solid var(--border);white-space:nowrap}
+.input-group input{border:none;border-radius:0}
+.input-group input:focus{box-shadow:none}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.welcome-submit{
+  width:100%;padding:14px;background:var(--accent);color:#fff;border:none;
+  border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px;
+  transition:filter 0.2s;
+}
+.welcome-submit:hover{filter:brightness(1.1)}
+
+/* APP LAYOUT */
+#app{display:none;min-height:100vh}
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--topbar-h);background:var(--card);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;
+  z-index:100;box-shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+.topbar-title{font-size:1.1rem;font-weight:700;color:var(--text)}
+.topbar-title span{color:var(--accent)}
+.hamburger{display:none;background:none;padding:8px;border-radius:8px}
+.hamburger:hover{background:var(--accent-light)}
+.hamburger svg{width:24px;height:24px;color:var(--text)}
+.sidebar{
+  position:fixed;top:var(--topbar-h);left:0;bottom:0;width:var(--sidebar-w);
+  background:var(--card);border-right:1px solid var(--border);overflow-y:auto;
+  z-index:90;transition:transform 0.3s ease;
+}
+.sidebar-nav{padding:12px 0}
+.nav-item{
+  display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer;
+  color:var(--muted);font-size:0.9rem;font-weight:500;transition:all 0.15s;
+  border-left:3px solid transparent;user-select:none;
+}
+.nav-item:hover{background:var(--accent-light);color:var(--accent)}
+.nav-item.active{background:var(--accent-light);color:var(--accent);border-left-color:var(--accent);font-weight:700}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:85;
+}
+.sidebar-overlay.show{display:block}
+.main-content{
+  margin-left:var(--sidebar-w);padding:calc(var(--topbar-h) + 20px) 24px 40px;
+  min-height:100vh;
+}
+.section{display:none}
+.section.active{display:block}
+.section-header{margin-bottom:20px}
+.section-header h2{margin-bottom:4px}
+.section-header p{font-size:0.9rem}
+
+/* DASHBOARD */
+.hero-card{
+  display:flex;border-radius:16px;overflow:hidden;margin-bottom:24px;
+  background:linear-gradient(135deg,var(--accent-light),rgba(255,255,255,0.9));
+  border:1px solid var(--border);min-height:180px;
+}
+.hero-left{flex:0 0 55%;padding:clamp(20px,3vw,36px);display:flex;flex-direction:column;justify-content:center;position:relative}
+.hero-left::after{content:'';position:absolute;top:0;right:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),transparent)}
+.hero-couple{font-size:clamp(1.4rem,3.5vw,2.2rem);font-weight:800;color:var(--text)}
+.hero-couple .amp{color:var(--accent);font-weight:400}
+.hero-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:3px;color:var(--muted);margin:8px 0 4px}
+.hero-date{font-size:1rem;font-weight:600;color:var(--text)}
+.hero-venue{color:var(--muted);font-size:0.9rem;margin-top:2px}
+.hero-right{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;gap:clamp(8px,2vw,16px)}
+.countdown-box{text-align:center;padding:8px 12px}
+.countdown-box .num{font-size:clamp(1.6rem,4vw,2.8rem);font-weight:800;color:var(--accent);line-height:1}
+.countdown-box .unit{font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:4px}
+.countdown-divider{width:1px;height:40px;background:var(--border);align-self:center}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{text-align:center}
+.stat-card .stat-num{font-size:clamp(1.4rem,3vw,2rem);font-weight:800;color:var(--text)}
+.stat-card .stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:2px}
+.stat-card .stat-num.green{color:var(--green)}
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.card-header h3{font-size:1rem}
+.card-header .subtitle{font-size:0.8rem;color:var(--muted);font-weight:400}
+.budget-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.budget-row .name{flex:0 0 120px;font-size:0.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.budget-row .bars{flex:1}
+.budget-bar{height:8px;border-radius:999px;background:#F3F4F6;overflow:hidden;margin-bottom:3px;position:relative}
+.budget-bar .fill{height:100%;border-radius:999px;transition:width 0.4s}
+.budget-bar .fill.estimated{background:var(--accent-light);position:absolute;top:0;left:0}
+.budget-bar .fill.actual{background:var(--accent);position:relative}
+.budget-bar .fill.actual.over{background:var(--red)}
+.budget-row .amounts{flex:0 0 100px;text-align:right;font-size:0.78rem;color:var(--muted)}
+.rsvp-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rsvp-row .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.rsvp-row .label{flex:0 0 80px;font-size:0.85rem;font-weight:500}
+.rsvp-row .bar-wrap{flex:1;height:8px;background:#F3F4F6;border-radius:999px;overflow:hidden}
+.rsvp-row .bar-fill{height:100%;border-radius:999px;transition:width 0.4s}
+.rsvp-row .count{flex:0 0 40px;text-align:right;font-size:0.8rem;color:var(--muted)}
+.empty-state{text-align:center;padding:30px 20px;color:var(--muted)}
+.empty-state .emoji{font-size:2rem;margin-bottom:8px}
+.empty-state p{font-size:0.85rem}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.filter-bar input[type="text"]{max-width:280px}
+.filter-bar select{max-width:180px}
+
+/* TABLES */
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--card)}
+.table-wrap table{margin:0}
+
+/* MODAL */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
+  z-index:200;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+.modal-overlay.show{display:flex}
+.modal{
+  background:var(--card);border-radius:16px;padding:clamp(20px,3vw,32px);
+  width:90%;max-width:500px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:modalIn 0.25s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-header h3{font-size:1.15rem}
+.modal-close{background:none;color:var(--muted);padding:4px;border-radius:6px;font-size:1.2rem}
+.modal-close:hover{background:#F3F4F6;color:var(--text)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{
+  padding:12px 20px;border-radius:10px;font-size:0.88rem;font-weight:500;color:#fff;
+  box-shadow:0 4px 20px rgba(0,0,0,0.15);animation:toastIn 0.3s ease;max-width:340px;
+}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+.toast.info{background:var(--accent)}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+
+/* TIMELINE */
+.tl-progress{margin-bottom:24px}
+.tl-progress .progress-bar{height:10px;margin-bottom:6px}
+.tl-progress .progress-text{font-size:0.85rem;color:var(--muted)}
+.tl-period{margin-bottom:16px}
+.tl-period-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tl-period-header h4{font-size:0.95rem;color:var(--accent-dark)}
+.tl-period-header .count{font-size:0.78rem;color:var(--muted);font-weight:500}
+.tl-task{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;transition:background 0.15s}
+.tl-task:hover{background:var(--accent-light)}
+.tl-task input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.tl-task .task-text{font-size:0.9rem;transition:all 0.2s;flex:1}
+.tl-task .task-delete{background:none;color:var(--muted);padding:2px 6px;border-radius:4px;font-size:0.75rem;opacity:0;transition:all 0.15s;flex-shrink:0}
+.tl-task:hover .task-delete{opacity:1}
+.tl-task .task-delete:hover{background:rgba(239,68,68,0.12);color:var(--red)}
+.tl-add-task-row{display:flex;align-items:center;gap:8px;padding:6px 12px}
+.tl-add-task-row .btn-sm{white-space:nowrap}
+.tl-note-card{background:var(--bg);border-radius:8px;padding:14px;margin-bottom:10px;position:relative}
+.tl-note-card .tl-note-text{font-size:0.9rem;color:var(--text);white-space:pre-wrap;word-break:break-word;line-height:1.5}
+.tl-note-card .tl-note-time{font-size:0.72rem;color:var(--muted);margin-top:6px}
+.tl-note-card .note-delete{position:absolute;top:8px;right:8px;background:none;color:var(--muted);padding:2px 6px;border-radius:4px;font-size:0.75rem;opacity:0;transition:all 0.15s}
+.tl-note-card:hover .note-delete{opacity:1}
+.tl-note-card .note-delete:hover{background:rgba(239,68,68,0.12);color:var(--red)}
+.tl-task.checked .task-text{text-decoration:line-through;color:var(--muted)}
+
+/* SETTINGS */
+.settings-card{margin-bottom:24px}
+.settings-card h3{margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F3F4F6}
+.settings-row .sr-label{font-weight:500;font-size:0.9rem}
+.settings-row .sr-value{color:var(--muted);font-size:0.9rem}
+.danger-zone{border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:20px;background:rgba(239,68,68,0.03)}
+.danger-zone h3{color:var(--red);margin-bottom:8px}
+.danger-zone p{font-size:0.85rem;margin-bottom:12px}
+
+/* RESPONSIVE */
+@media(max-width:1400px){
+  .stats-row{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:1024px){
+  :root{--sidebar-w:220px}
+  .dashboard-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .hamburger{display:block}
+  .sidebar{transform:translateX(-100%);width:280px}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{margin-left:0;padding:calc(var(--topbar-h) + 16px) 16px 40px}
+  .hero-card{flex-direction:column}
+  .hero-left::after{display:none}
+  .hero-right{padding:16px}
+  .two-col{grid-template-columns:1fr}
+  .filter-bar{flex-direction:column;align-items:stretch}
+  .filter-bar input[type="text"],.filter-bar select{max-width:100%}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .budget-row .name{flex:0 0 80px;font-size:0.78rem}
+  }
+@media(max-width:400px){
+  .welcome-card{padding:20px}
+    .stats-row{grid-template-columns:1fr}
+    }
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+</style>
+</head>
+<body>
+
+<!-- WELCOME SCREEN -->
+<div id="welcome">
+  <div class="welcome-card">
+    <div class="welcome-circle c1"></div>
+    <div class="welcome-circle c2"></div>
+    <div class="welcome-circle c3"></div>
+    <h1 class="welcome-title">Welcome Bestie!</h1>
+    <p class="welcome-sub">Let's plan your dream wedding</p>
+    <form id="setupForm" novalidate>
+      <div class="welcome-section">
+        <h3>Couple</h3>
+        <div class="input-group">
+          <span class="prefix">💕</span>
+          <input type="text" name="coupleName" placeholder="Sarah & James" required>
+        </div>
+        <div class="form-error" id="err-couple"></div>
+      </div>
+      <div class="welcome-section">
+        <h3>Event Details</h3>
+        <div class="two-col">
+          <div>
+            <div class="input-group">
+              <span class="prefix">📅</span>
+              <input type="date" name="weddingDate" required>
+            </div>
+            <div class="form-error" id="err-date"></div>
+          </div>
+          <div>
+            <div class="input-group">
+              <span class="prefix">📍</span>
+              <input type="text" name="venue" placeholder="Grand Ballroom" required>
+            </div>
+            <div class="form-error" id="err-venue"></div>
+          </div>
+        </div>
+      </div>
+      <div class="welcome-section">
+        <h3>Budget</h3>
+        <div class="input-group">
+          <span class="prefix">$</span>
+          <input type="number" name="totalBudget" placeholder="25000" min="1" required>
+        </div>
+        <div class="form-error" id="err-budget"></div>
+      </div>
+      <div class="welcome-section">
+        <h3 id="langLabel">Language</h3>
+        <div class="input-group">
+          <span class="prefix">🌐</span>
+          <select id="langSelectWelcome" style="border:none;padding:10px 0;flex:1;background:transparent;font-size:0.9rem;color:var(--text);outline:none;">
+            <option value="en">English</option>
+            <option value="fr">Fran&ccedil;ais</option>
+            <option value="es">Espa&ntilde;ol</option>
+            <option value="de">Deutsch</option>
+            <option value="nl">Nederlands</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="welcome-submit">Let's Start Planning Bestie ✨</button>
+    </form>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="hamburger" id="hamburgerBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="topbar-title" id="topbarTitle"></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <span id="saveIndicator" style="font-size:0.72rem;color:var(--muted);opacity:0;transition:opacity 0.3s;white-space:nowrap"></span>
+    </div>
+  </div>
+
+  <!-- SIDEBAR OVERLAY -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-nav" id="sidebarNav"></div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content" id="main-content">
+    <div id="section-dashboard" class="section"></div>
+    <div id="section-timeline" class="section"></div>
+    <div id="section-budget" class="section"></div>
+    <div id="section-guests" class="section"></div>
+    <div id="section-rsvp" class="section"></div>
+    <div id="section-settings" class="section"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<!-- BACKUP REMINDER BANNER -->
+<div id="backupReminderBanner" style="position:fixed;top:0;left:0;right:0;z-index:400;background:#FEF3C7;border-bottom:2px solid #F59E0B;padding:12px 20px;display:none;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">
+  <span id="backupReminderText" style="font-size:0.88rem;font-weight:600;color:#92400E">📦 <span data-i18n="backupReminderText"></span></span>
+  <div style="display:flex;gap:8px">
+    <button id="backupExportBtn" style="padding:6px 14px;border-radius:6px;background:#F59E0B;color:#fff;font-weight:600;font-size:0.82rem;border:none;cursor:pointer">Export Now</button>
+    <button id="backupDismissBtn" style="padding:6px 14px;border-radius:6px;background:transparent;color:#92400E;font-weight:500;font-size:0.82rem;border:1px solid #F59E0B;cursor:pointer">Dismiss</button>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// =============================================
+// UTILITY FUNCTIONS
+// =============================================
+
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  var s = String(str);
+  var div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function fmt$(num) {
+  if (num === null || num === undefined || isNaN(num)) return '$0.00';
+  return '$' + Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return t('noDateSet');
+  var d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return t('noDateSet');
+  var months = t('months').split(',');
+  return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+}
+
+function rsvpBadge(status) {
+  var s = (status || 'pending').toLowerCase();
+ var key = 'rsvp' + s.charAt(0).toUpperCase() + s.slice(1);
+  return '<span class="badge badge-' + s + '">' + t(key) + '</span>';
+}
+
+var _idCounter = 0;
+function generateId() {
+  _idCounter++;
+  return 'id_' + Date.now().toString(36) + '_' + _idCounter;
+}
+
+var _lastSaveTime = null;
+var _saveFailCount = 0;
+
+function saveData() {
+  try {
+    localStorage.setItem('weddingPlannerData', JSON.stringify(appData));
+    _lastSaveTime = Date.now();
+    localStorage.setItem('weddingPlannerLastSaved', String(_lastSaveTime));
+    _saveFailCount = 0;
+    updateSaveIndicator();
+  } catch (e) {
+    _saveFailCount++;
+    if (_saveFailCount <= 2) {
+      showToast(t('saveFailed'), 'error');
+    }
+    if (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014) {
+      setTimeout(function() {
+        showToast(t('storageFull'), 'error');
+      }, 400);
+    }
+  }
+}
+
+function updateSaveIndicator() {
+  var el = document.getElementById('saveIndicator');
+  if (el) {
+    if (_lastSaveTime) {
+      el.textContent = t('lastSavedOn') + formatRelativeTime(_lastSaveTime);
+      el.style.opacity = '1';
+    } else {
+      el.textContent = '';
+    }
+  }
+  var dashEl = document.getElementById('dashboardLastSaved');
+  if (dashEl && _lastSaveTime) {
+    dashEl.textContent = t('lastSavedOn') + formatRelativeTime(_lastSaveTime);
+  }
+}
+
+function formatRelativeTime(timestamp) {
+  var seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 10) return t('justNow');
+  if (seconds < 60) return t('secondsAgo').replace('{n}', seconds);
+  var minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return t('minutesAgo').replace('{n}', minutes);
+  var hours = Math.floor(minutes / 60);
+  if (hours < 24) return t('hoursAgo').replace('{n}', hours);
+  var days = Math.floor(hours / 24);
+  return t('daysAgo').replace('{n}', days);
+}
+
+function loadData() {
+  try {
+    var raw = localStorage.getItem('weddingPlannerData');
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      appData = Object.assign({}, defaultData, parsed);
+      if (!appData.budgetCategories || appData.budgetCategories.length === 0) {
+        appData.budgetCategories = buildDefaultBudget();
+      }
+      if (!appData.timelineTasks || appData.timelineTasks.length === 0) {
+        appData.timelineTasks = buildDefaultTimeline();
+      }
+      if (!appData.timelineNotes) appData.timelineNotes = [];
+      if (appData.language) {
+        currentLang = appData.language;
+      }
+    }
+  } catch (e) {
+    var corrupted = true;
+    try {
+      var rawCheck = localStorage.getItem('weddingPlannerData');
+      if (!rawCheck || rawCheck.length < 5) corrupted = false;
+    } catch(e2) {}
+    if (corrupted) {
+      appData = Object.assign({}, defaultData);
+      setTimeout(function() {
+        var html = '<div class="modal-header"><h3>' + t('dataCorruptedTitle') + '</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>';
+        html += '<p style="margin-bottom:16px;color:var(--muted)">' + t('dataCorruptedText') + '</p>';
+        html += '<p style="margin-bottom:20px;color:var(--muted);font-size:0.85rem">' + t('dataCorruptedHint') + '</p>';
+        html += '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">' + t('ok') + '</button></div>';
+        showModal(html);
+      }, 500);
+    } else {
+      appData = Object.assign({}, defaultData);
+    }
+  }
+}
+
+// =============================================
+// DEFAULT DATA
+// =============================================
+
+function buildDefaultBudget() {
+  var cats = ['Venue & Rentals','Catering & Bar','Photography','Videography','Florals & Decor','Music & Entertainment','Bridal Attire',"Groom's Attire",'Hair & Makeup','Wedding Cake','Invitations & Stationery','Transportation','Officiant','Miscellaneous'];
+  var arr = [];
+  for (var i = 0; i < cats.length; i++) {
+    arr.push({ id: generateId(), name: cats[i], estimated: 0, actual: 0 });
+  }
+  return arr;
+}
+
+function buildDefaultTimeline() {
+  var periods = [
+    { name: '12+ Months Out', tasks: ['tlSetBudget','tlCreateGuestList','tlResearchVenues','tlStartVendorSearch'] },
+    { name: '9-12 Months Out', tasks: ['tlBookVenue','tlHirePhotographer','tlChooseBridalParty','tlBookEntertainment'] },
+    { name: '6-9 Months Out', tasks: ['tlBookCaterer','tlSelectFlorist','tlOrderDress','tlPlanHoneymoon'] },
+    { name: '4-6 Months Out', tasks: ['tlSendSaveTheDates','tlBookOfficiant','tlArrangeTransportation','tlStartRegistry'] },
+    { name: '3-4 Months Out', tasks: ['tlOrderInvitations','tlBookHairMakeup','tlPlanRehearsalDinner','tlScheduleFittings'] },
+    { name: '2-3 Months Out', tasks: ['tlSendInvitations','tlFinalizeMenu','tlConfirmVendors','tlPlanSeatingChart'] },
+    { name: '1-2 Months Out', tasks: ['tlFinalDressFitting','tlMarriageLicense','tlRehearsalTimeline','tlFinalizeDetails'] },
+    { name: 'Wedding Week', tasks: ['tlConfirmAllVendors','tlPrepareSeatingCards','tlWeddingRehearsal','tlRehearsalDinner','tlGetBeautyTreatments','tlPackForHoneymoon','tlSetUpVenue','tlFinalWalkthrough'] }
+  ];
+  var arr = [];
+  for (var i = 0; i < periods.length; i++) {
+    for (var j = 0; j < periods[i].tasks.length; j++) {
+      arr.push({ id: generateId(), period: periods[i].name, text: periods[i].tasks[j], done: false });
+    }
+  }
+  return arr;
+}
+
+var defaultData = {
+  coupleName: '',
+  weddingDate: '',
+  venue: '',
+  totalBudget: 0,
+  setupComplete: false,
+  guests: [],
+  budgetCategories: [],
+  timelineTasks: [],
+  timelineNotes: [],
+};
+
+var appData = Object.assign({}, defaultData);
+
+// =============================================
+// TRANSLATION SYSTEM
+// =============================================
+
+var currentLang = 'en';
+
+var TRANSLATIONS = {
+  en: {
+    welcomeTitle: 'Welcome Bestie!',
+    welcomeSub: "Let's plan your dream wedding",
+    couple: 'Couple',
+    eventDetails: 'Event Details',
+    budget: 'Budget',
+    language: 'Language',
+    letsStart: "Let's Start Planning Bestie ✨",
+    errCoupleRequired: 'Please enter the couple names',
+    errDateRequired: 'Please select a wedding date',
+    errVenueRequired: 'Please enter the venue',
+    errBudgetRequired: 'Please enter a valid budget amount',
+    appTitle: 'My <span>Wedding</span> Planner',
+    navDashboard: 'Dashboard',
+    navTimeline: 'Timeline',
+    navBudgetTracker: 'Budget Tracker',
+    navGuests: 'Guests',
+    navRsvpTracker: 'RSVP Tracker',
+    navSettings: 'Settings',
+    bigDay: 'Big Day',
+    noDateSet: 'No date set',
+    noVenue: 'No venue',
+    totalGuests: 'Total Guests',
+    confirmed: 'Confirmed',
+    rsvpRate: 'RSVP Rate',
+    tasksDone: 'Tasks Done',
+    budgetOverview: 'Budget Overview',
+    total: 'Total',
+    rsvpSummary: 'RSVP Summary',
+    invited: 'invited',
+    noBudgetYet: 'No budget data yet. Head to Budget Tracker to add estimates!',
+    noGuestsYet: 'No guests yet. Add your guest list to track RSVPs!',
+    attending: 'Attending',
+    pending: 'Pending',
+    declined: 'Declined',
+    maybe: 'Maybe',
+    timelineTitle: 'Timeline',
+    timelineSub: 'Track your wedding planning tasks',
+    tasksOf: 'tasks of',
+    complete: 'complete',
+    category: 'Category',
+    notes: 'Notes',
+    catAll: 'All',
+    name: 'Name',
+    type: 'Type',
+    contact: 'Contact',
+    rsvp: 'RSVP',
+    mealPreference: 'Meal Preference',
+    plusOne: 'Plus One',
+    plusOneName: 'Plus One Name',
+    notesField: 'Notes',
+    nameRequired: 'Name is required',
+    updated: 'Updated',
+    added: 'Added',
+    cancel: 'Cancel',
+    save: 'Save',
+    edit: 'Edit',
+    delete: 'Delete',
+    yes: 'Yes',
+    noOpt: 'No',
+    none: 'None',
+    emailOrPhone: 'Email or Phone',
+    thName: 'Name',
+    thType: 'Type',
+    thContact: 'Contact',
+    thRsvp: 'RSVP',
+    thMeal: 'Meal',
+    thPlusOne: 'Plus One',
+    thActions: 'Actions',
+    bridesmaid: 'Bridesmaid',
+    groomsman: 'Groomsman',
+    guest: 'Guest',
+    family: 'Family',
+    officiant: 'Officiant',
+    searchName: 'Search name...',
+    allTypes: 'All Types',
+    guestsTitle: 'Guests',
+    guestsSub: 'Manage your guest list',
+    addGuest: 'Add Guest',
+    editGuest: 'Edit Guest',
+    addGuestTitle: 'Add Guest',
+    noGuestsList: 'No guests yet. Add your first guest!',
+    removeGuest: 'Remove',
+    guestRemoved: 'Guest removed',
+    rsvpTrackerTitle: 'RSVP Tracker',
+    rsvpTrackerSub: 'Track responses from your guests',
+    totalInvited: 'Total Invited',
+    mealSummary: 'Meal Summary',
+    overdueFollowUps: 'Overdue follow-ups',
+    daysUntilWedding: 'days until wedding',
+    noMatchingGuests: 'No matching guests',
+    allFilter: 'All',
+    mealChicken: 'Chicken',
+    mealBeef: 'Beef',
+    mealFish: 'Fish',
+    mealVegetarian: 'Vegetarian',
+    mealVegan: 'Vegan',
+    mealOther: 'Other',
+    budgetTrackerTitle: 'Budget Tracker',
+    budgetTrackerSub: 'Manage your wedding budget',
+    totalBudgetLabel: 'Total Budget',
+    totalSpent: 'Total Spent',
+    remaining: 'Remaining',
+    ofBudgetUsed: '% of budget used',
+    estimated: 'Estimated',
+    actual: 'Actual',
+    difference: 'Difference',
+    overBudget: 'Over Budget',
+    underBudget: 'Under Budget',
+    budgetUpdated: 'Budget updated',
+    catVenueRentals: 'Venue & Rentals',
+    catCateringBar: 'Catering & Bar',
+    catPhotography: 'Photography',
+    catVideography: 'Videography',
+    catFloralsDecor: 'Florals & Decor',
+    catMusicEntertainment: 'Music & Entertainment',
+    catBridalAttire: 'Bridal Attire',
+    catGroomAttire: "Groom's Attire",
+    catHairMakeup: 'Hair & Makeup',
+    catWeddingCake: 'Wedding Cake',
+    catInvitationsStationery: 'Invitations & Stationery',
+    catTransportation: 'Transportation',
+    catOfficiant: 'Officiant',
+    catMiscellaneous: 'Miscellaneous',
+    vCatAll: 'All',
+    time: 'Time',
+    notSet: 'Not set',
+    settingsTitle: 'Settings',
+    settingsSub: 'Manage your wedding settings',
+    weddingDetails: 'Wedding Details',
+    coupleNames: 'Couple Names',
+    weddingDate: 'Wedding Date',
+    venueSetting: 'Venue',
+    editDetails: 'Edit Details',
+    dataManagement: 'Data Management',
+    exportData: 'Export Data',
+    importData: 'Import Data',
+    dangerZone: 'Danger Zone',
+    dangerZoneText: 'This action cannot be undone. All data will be permanently deleted.',
+    resetAllData: 'Reset All Data',
+    resetConfirm: 'Are you sure you want to reset all data?',
+    dataExported: 'Data exported successfully',
+    dataImported: 'Data imported successfully',
+    invalidImport: 'Invalid import file',
+    rsvpPending: 'Pending',
+    rsvpAttending: 'Attending',
+    rsvpDeclined: 'Declined',
+    rsvpMaybe: 'Maybe',
+    over: 'over',
+    under: 'under',
+    resetEverything: 'Reset Everything',
+    dataReset: 'All data has been reset',
+    editWeddingDetails: 'Edit Wedding Details',
+    coupleNamesRequired: 'Couple names are required',
+    invalidDate: 'Invalid date',
+    detailsUpdated: 'Details updated!',
+    noGuestsYetTable: 'No guests yet',
+    removeGuestConfirm: 'Remove this guest?',
+    dangerZoneText: 'This will permanently delete all your wedding planning data and cannot be undone.',
+    resetModalText: 'Are you sure you want to delete all your wedding planning data? This action cannot be undone.',
+    invalidFileFormat: 'Invalid file format',
+    timelineSub: 'Track your wedding planning progress',
+    tlPeriod12: '12+ Months Out',
+    tlPeriod9: '9-12 Months Out',
+    tlPeriod6: '6-9 Months Out',
+    tlPeriod4: '4-6 Months Out',
+    tlPeriod3: '3-4 Months Out',
+    tlPeriod2: '2-3 Months Out',
+    tlPeriod1: '1-2 Months Out',
+    tlPeriodWeek: 'Wedding Week',
+    tlSetBudget: 'Set budget',
+    tlCreateGuestList: 'Create guest list',
+    tlResearchVenues: 'Research venues',
+    tlStartVendorSearch: 'Start vendor search',
+    tlBookVenue: 'Book venue',
+    tlHirePhotographer: 'Hire photographer',
+    tlChooseBridalParty: 'Choose bridal party',
+    tlBookEntertainment: 'Book entertainment',
+    tlBookCaterer: 'Book caterer',
+    tlSelectFlorist: 'Select florist',
+    tlOrderDress: 'Order dress',
+    tlPlanHoneymoon: 'Plan honeymoon',
+    tlSendSaveTheDates: 'Send save-the-dates',
+    tlBookOfficiant: 'Book officiant',
+    tlArrangeTransportation: 'Arrange transportation',
+    tlStartRegistry: 'Start registry',
+    tlOrderInvitations: 'Order invitations',
+    tlBookHairMakeup: 'Book hair/makeup',
+    tlPlanRehearsalDinner: 'Plan rehearsal dinner',
+    tlScheduleFittings: 'Schedule fittings',
+    tlSendInvitations: 'Send invitations',
+    tlFinalizeMenu: 'Finalize menu',
+    tlConfirmVendors: 'Confirm vendors',
+    tlPlanSeatingChart: 'Plan seating chart',
+    tlFinalDressFitting: 'Final dress fitting',
+    tlMarriageLicense: 'Marriage license',
+    tlRehearsalTimeline: 'Rehearsal timeline',
+    tlFinalizeDetails: 'Finalize details',
+    tlConfirmAllVendors: 'Confirm all vendors',
+    tlPrepareSeatingCards: 'Prepare seating cards',
+    tlWeddingRehearsal: 'Wedding rehearsal',
+    tlRehearsalDinner: 'Rehearsal dinner',
+    tlGetBeautyTreatments: 'Get beauty treatments',
+    tlPackForHoneymoon: 'Pack for honeymoon',
+    tlSetUpVenue: 'Set up venue',
+    tlFinalWalkthrough: 'Final walkthrough',
+    tlAddTask: 'Add Task',
+    tlDeleteTask: 'Delete',
+    tlDeleteTaskConfirm: 'Delete this task?',
+    tlTaskDeleted: 'Task deleted',
+    tlAddTaskTitle: 'Add Task',
+    tlTaskText: 'Task description',
+    tlTaskPeriod: 'Period',
+    tlTaskRequired: 'Task description is required',
+    tlCustom: 'Custom',
+    tlNotesTitle: 'Notes',
+    tlNotesSub: 'Jot down your ideas and reminders',
+    tlAddNote: 'Add Note',
+    tlNoteText: 'Write your note here...',
+    tlNoteRequired: 'Note text is required',
+    tlNoteAdded: 'Note added',
+    tlDeleteNote: 'Delete',
+    tlDeleteNoteConfirm: 'Delete this note?',
+    tlNoteDeleted: 'Note deleted',
+    tlNoNotesYet: 'No notes yet. Write your first note!',
+    tlSelectPeriod: 'Select a period',
+    months: 'January,February,March,April,May,June,July,August,September,October,November,December',
+    saveFailed: 'Failed to save your data! Please export a backup immediately.',
+    storageFull: 'Storage is full. Remove some mood board images and try again.',
+    lastSaved: 'Last saved:',
+    justNow: 'just now',
+    secondsAgo: '{n} seconds ago',
+    minutesAgo: '{n} minutes ago',
+    hoursAgo: '{n} hours ago',
+    daysAgo: '{n} days ago',
+    never: 'Never',
+    backupReminderText: 'It\'s been a while since your last backup. Export your data to keep it safe!',
+    backupExportNow: 'Export Now',
+    backupDismiss: 'Remind me later',
+    dataHealth: 'Data Health',
+    lastBackup: 'Last Backup',
+    dataCorruptedTitle: 'Data Recovery',
+    dataCorruptedText: 'We couldn\'t load your saved data. It may have been corrupted.',
+    dataCorruptedHint: 'If you previously exported a backup, you can restore it using Import Data in Settings.',
+    saveOnDevice: 'Save On Your Device',
+    saveOnDeviceDesc: 'Download a backup of all your wedding data to keep it safe.',
+    lastSavedOn: 'Last saved: '
+  },
+  fr: {
+    welcomeTitle: 'Bienvenue !',
+    welcomeSub: 'Organisons le mariage de vos r\u00eaves',
+    couple: 'Couple',
+    eventDetails: 'D\u00e9tails de l\u2019\u00e9v\u00e9nement',
+    budget: 'Budget',
+    language: 'Langue',
+    letsStart: 'Commen\u00e7ons la planification \u2728',
+    errCoupleRequired: 'Veuillez saisir les noms du couple',
+    errDateRequired: 'Veuillez s\u00e9lectionner une date de mariage',
+    errVenueRequired: 'Veuillez saisir le lieu',
+    errBudgetRequired: 'Veuillez saisir un montant de budget valide',
+    appTitle: 'Mon <span>Mariage</span> Planner',
+    navDashboard: 'Tableau de bord',
+    navTimeline: 'Chronologie',
+    navBudgetTracker: 'Suivi du budget',
+    navGuests: 'Invit\u00e9s',
+    navRsvpTracker: 'Suivi des RSVP',
+    navSettings: 'Param\u00e8tres',
+    bigDay: 'Le grand jour',
+    noDateSet: 'Aucune date d\u00e9finie',
+    noVenue: 'Aucun lieu',
+    totalGuests: 'Total invit\u00e9s',
+    confirmed: 'Confirm\u00e9s',
+    rsvpRate: 'Taux de r\u00e9ponse',
+    tasksDone: 'T\u00e2ches termin\u00e9es',
+    budgetOverview: 'Vue d\u2019ensemble du budget',
+    total: 'Total',
+    rsvpSummary: 'R\u00e9sum\u00e9 des RSVP',
+    invited: 'invit\u00e9s',
+    noBudgetYet: 'Aucune donn\u00e9e budg\u00e9taire. Allez dans le suivi du budget pour ajouter des estimations !',
+    noGuestsYet: 'Aucun invit\u00e9. Ajoutez votre liste pour suivre les RSVP !',
+    attending: 'Pr\u00e9sents',
+    pending: 'En attente',
+    declined: 'Refus\u00e9s',
+    maybe: 'Peut-\u00eatre',
+    timelineTitle: 'Chronologie',
+    timelineSub: 'Suivez les t\u00e2ches de planification',
+    tasksOf: 't\u00e2ches sur',
+    complete: 'termin\u00e9es',
+    category: 'Cat\u00e9gorie',
+    notes: 'Notes',
+    catAll: 'Tout',
+    name: 'Nom',
+    type: 'Type',
+    contact: 'Contact',
+    rsvp: 'RSVP',
+    mealPreference: 'Pr\u00e9f\u00e9rence alimentaire',
+    plusOne: 'Accompagnateur',
+    plusOneName: "Nom de l\u2019accompagnateur",
+    notesField: 'Notes',
+    nameRequired: 'Le nom est requis',
+    updated: 'Mis \u00e0 jour',
+    added: 'Ajout\u00e9',
+    cancel: 'Annuler',
+    save: 'Enregistrer',
+    edit: 'Modifier',
+    delete: 'Supprimer',
+    yes: 'Oui',
+    noOpt: 'Non',
+    none: 'Aucun',
+    emailOrPhone: 'E-mail ou t\u00e9l\u00e9phone',
+    thName: 'Nom',
+    thType: 'Type',
+    thContact: 'Contact',
+    thRsvp: 'RSVP',
+    thMeal: 'Repas',
+    thPlusOne: 'Accompagnateur',
+    thActions: 'Actions',
+    bridesmaid: 'Demoiselle d\u2019honneur',
+    groomsman: 'Gar\u00e7on d\u2019honneur',
+    guest: 'Invit\u00e9',
+    family: 'Famille',
+    officiant: 'Officiant',
+    searchName: 'Rechercher un nom...',
+    allTypes: 'Tous les types',
+    guestsTitle: 'Invit\u00e9s',
+    guestsSub: 'G\u00e9rez votre liste d\u2019invit\u00e9s',
+    addGuest: 'Ajouter un invit\u00e9',
+    editGuest: "Modifier l\u2019invit\u00e9",
+    addGuestTitle: 'Ajouter un invit\u00e9',
+    noGuestsList: 'Aucun invit\u00e9. Ajoutez votre premier invit\u00e9 !',
+    removeGuest: 'Retirer',
+    guestRemoved: 'Invit\u00e9 retir\u00e9',
+    rsvpTrackerTitle: 'Suivi des RSVP',
+    rsvpTrackerSub: 'Suivez les r\u00e9ponses de vos invit\u00e9s',
+    totalInvited: 'Total invit\u00e9s',
+    mealSummary: 'R\u00e9sum\u00e9 des repas',
+    overdueFollowUps: 'Relances en retard',
+    daysUntilWedding: 'jours avant le mariage',
+    noMatchingGuests: 'Aucun invit\u00e9 correspondant',
+    allFilter: 'Tous',
+    mealChicken: 'Poulet',
+    mealBeef: 'B\u0153uf',
+    mealFish: 'Poisson',
+    mealVegetarian: 'V\u00e9g\u00e9tarien',
+    mealVegan: 'V\u00e9gan',
+    mealOther: 'Autre',
+    budgetTrackerTitle: 'Suivi du budget',
+    budgetTrackerSub: 'G\u00e9rez le budget de votre mariage',
+    totalBudgetLabel: 'Budget total',
+    totalSpent: 'Total d\u00e9pens\u00e9',
+    remaining: 'Restant',
+    ofBudgetUsed: '% du budget utilis\u00e9',
+    estimated: 'Estim\u00e9',
+    actual: 'R\u00e9el',
+    difference: 'Diff\u00e9rence',
+    overBudget: 'D\u00e9passement',
+    underBudget: 'En dessous',
+    budgetUpdated: 'Budget mis \u00e0 jour',
+    catVenueRentals: 'Lieu & Location',
+    catCateringBar: 'Traiteur & Bar',
+    catPhotography: 'Photographie',
+    catVideography: 'Vid\u00e9o',
+    catFloralsDecor: 'Fleurs & D\u00e9coration',
+    catMusicEntertainment: 'Musique & Divertissement',
+    catBridalAttire: 'Tenue de la mari\u00e9e',
+    catGroomAttire: 'Tenue du mari\u00e9',
+    catHairMakeup: 'Coiffure & Maquillage',
+    catWeddingCake: 'G\u00e2teau de mariage',
+    catInvitationsStationery: 'Invitations & Papeterie',
+    catTransportation: 'Transport',
+    catOfficiant: 'Officiant',
+    catMiscellaneous: 'Divers',
+    vCatAll: 'Tous',
+    time: 'Heure',
+    notSet: 'Non d\u00e9fini',
+    settingsTitle: 'Param\u00e8tres',
+    settingsSub: 'G\u00e9rez les param\u00e8tres de votre mariage',
+    weddingDetails: 'D\u00e9tails du mariage',
+    coupleNames: 'Noms du couple',
+    weddingDate: 'Date du mariage',
+    venueSetting: 'Lieu',
+    editDetails: 'Modifier les d\u00e9tails',
+    dataManagement: 'Gestion des donn\u00e9es',
+    exportData: 'Exporter les donn\u00e9es',
+    importData: 'Importer les donn\u00e9es',
+    dangerZone: 'Zone de danger',
+    dangerZoneText: 'Cette action est irr\u00e9versible. Toutes les donn\u00e9es seront supprim\u00e9es d\u00e9finitivement.',
+    resetAllData: 'R\u00e9initialiser toutes les donn\u00e9es',
+    resetConfirm: '\u00cates-vous s\u00fbr de vouloir r\u00e9initialiser toutes les donn\u00e9es ?',
+    dataExported: 'Donn\u00e9es export\u00e9es avec succ\u00e8s',
+    dataImported: 'Donn\u00e9es import\u00e9es avec succ\u00e8s',
+    invalidImport: "Fichier d\u2019importation invalide",
+    tlPeriod12: '12+ mois et plus',
+    tlPeriod9: '9-12 mois',
+    tlPeriod6: '6-9 mois',
+    tlPeriod4: '4-6 mois',
+    tlPeriod3: '3-4 mois',
+    tlPeriod2: '2-3 mois',
+    tlPeriod1: '1-2 mois',
+    tlPeriodWeek: 'Semaine du mariage',
+    tlSetBudget: 'D\u00e9finir le budget',
+    tlCreateGuestList: 'Cr\u00e9er la liste des invit\u00e9s',
+    tlResearchVenues: 'Rechercher des lieux',
+    tlStartVendorSearch: 'Commencer la recherche de prestataires',
+    tlBookVenue: 'R\u00e9server le lieu',
+    tlHirePhotographer: 'Engager un photographe',
+    tlChooseBridalParty: 'Choisir les demoiselles d\u2019honneur',
+    tlBookEntertainment: 'R\u00e9server l\u2019animation',
+    tlBookCaterer: 'R\u00e9server le traiteur',
+    tlSelectFlorist: 'Choisir le fleuriste',
+    tlOrderDress: 'Commander la robe',
+    tlPlanHoneymoon: 'Planifier la lune de miel',
+    tlSendSaveTheDates: 'Envoyer les save-the-dates',
+    tlBookOfficiant: 'R\u00e9server l\u2019officiant',
+    tlArrangeTransportation: 'Organiser le transport',
+    tlStartRegistry: 'Cr\u00e9er la liste de cadeaux',
+    tlOrderInvitations: 'Commander les faire-part',
+    tlBookHairMakeup: 'R\u00e9server coiffeur/maquilleur',
+    tlPlanRehearsalDinner: 'Planifier le d\u00eener de r\u00e9p\u00e9tition',
+    tlScheduleFittings: 'Planifier les essayages',
+    tlSendInvitations: 'Envoyer les faire-part',
+    tlFinalizeMenu: 'Finaliser le menu',
+    tlConfirmVendors: 'Confirmer les prestataires',
+    tlPlanSeatingChart: 'Planifier le plan de table',
+    tlFinalDressFitting: 'Dernier essayage de la robe',
+    tlMarriageLicense: 'Obtenir le certificat de mariage',
+    tlRehearsalTimeline: 'Planning de la r\u00e9p\u00e9tition',
+    tlFinalizeDetails: 'Finaliser les d\u00e9tails',
+    tlConfirmAllVendors: 'Confirmer tous les prestataires',
+    tlPrepareSeatingCards: 'Pr\u00e9parer les cartes de place',
+    tlWeddingRehearsal: 'R\u00e9p\u00e9tition du mariage',
+    tlRehearsalDinner: 'D\u00eener de r\u00e9p\u00e9tition',
+    tlGetBeautyTreatments: 'Soin beaut\u00e9',
+    tlPackForHoneymoon: 'Pr\u00e9parer les valises pour la lune de miel',
+    tlSetUpVenue: 'Installer le lieu',
+    tlFinalWalkthrough: 'Visite finale',
+    tlAddTask: 'Ajouter une t\u00e2che',
+    tlDeleteTask: 'Supprimer',
+    tlDeleteTaskConfirm: 'Supprimer cette t\u00e2che ?',
+    tlTaskDeleted: 'T\u00e2che supprim\u00e9e',
+    tlAddTaskTitle: 'Ajouter une t\u00e2che',
+    tlTaskText: 'Description de la t\u00e2che',
+    tlTaskPeriod: 'P\u00e9riode',
+    tlTaskRequired: 'La description de la t\u00e2che est requise',
+    tlCustom: 'Personnalis\u00e9',
+    tlNotesTitle: 'Notes',
+    tlNotesSub: 'Notez vos id\u00e9es et rappels',
+    tlAddNote: 'Ajouter une note',
+    tlNoteText: '\u00c9crivez votre note ici...',
+    tlNoteRequired: 'Le texte de la note est requis',
+    tlNoteAdded: 'Note ajout\u00e9e',
+    tlDeleteNote: 'Supprimer',
+    tlDeleteNoteConfirm: 'Supprimer cette note ?',
+    tlNoteDeleted: 'Note supprim\u00e9e',
+    tlNoNotesYet: 'Pas encore de notes. \u00c9crivez votre premi\u00e8re note !',
+    tlSelectPeriod: 'S\u00e9lectionner une p\u00e9riode',
+    months: 'Janvier,F\u00e9vrier,Mars,Avril,Mai,Juin,Juillet,Ao\u00fbt,Septembre,Octobre,Novembre,D\u00e9cembre',
+    rsvpPending: 'En attente',
+    rsvpAttending: 'Pr\u00e9sents',
+    rsvpDeclined: 'Refus\u00e9s',
+    rsvpMaybe: 'Peut-\u00eatre',
+    over: 'au-dessus',
+    under: 'en dessous',
+    resetEverything: 'Tout r\u00e9initialiser',
+    dataReset: 'Toutes les donn\u00e9es ont \u00e9t\u00e9 r\u00e9initialis\u00e9es',
+    editWeddingDetails: 'Modifier les d\u00e9tails du mariage',
+    coupleNamesRequired: 'Les noms du couple sont requis',
+    invalidDate: 'Date invalide',
+    detailsUpdated: 'D\u00e9tails mis \u00e0 jour !',
+    noGuestsYetTable: 'Aucun invit\u00e9 encore',
+    removeGuestConfirm: 'Supprimer cet invit\u00e9 ?',
+    dangerZoneText: "Cela supprimera d\u00e9finitivement toutes vos donn\u00e9es de planification de mariage et ne pourra pas \u00eatre annul\u00e9.",
+    resetModalText: "\u00catres-vous s\u00fbr de vouloir supprimer toutes vos donn\u00e9es de planification de mariage ? Cette action est irr\u00e9versible.",
+    invalidFileFormat: "Format de fichier invalide",
+    timelineSub: 'Suivez vos t\u00e2ches de planification',
+    saveFailed: 'Impossible de sauvegarder vos donn\u00e9es ! Exportez une sauvegarde imm\u00e9diatement.',
+    storageFull: 'Le stockage est plein. Supprimez des images du tableau d\'inspiration et r\u00e9essayez.',
+    lastSaved: 'Derni\u00e8re sauvegarde :',
+    justNow: '\u00e0 l\'instant',
+    secondsAgo: 'il y a {n} secondes',
+    minutesAgo: 'il y a {n} minutes',
+    hoursAgo: 'il y a {n} heures',
+    daysAgo: 'il y a {n} jours',
+    never: 'Jamais',
+    backupReminderText: 'Cela fait un moment que vous n\'avez pas sauvegard\u00e9. Exportez vos donn\u00e9es pour les garder en s\u00e9curit\u00e9 !',
+    backupExportNow: 'Exporter',
+    backupDismiss: 'Me rappeler plus tard',
+    dataHealth: 'Sant\u00e9 des donn\u00e9es',
+    lastBackup: 'Derni\u00e8re sauvegarde',
+    dataCorruptedTitle: 'R\u00e9cup\u00e9ration de donn\u00e9es',
+    dataCorruptedText: 'Nous n\'avons pas pu charger vos donn\u00e9es sauvegard\u00e9es. Elles ont peut-\u00eatre \u00e9t\u00e9 corrompues.',
+    dataCorruptedHint: 'Si vous avez export\u00e9 une sauvegarde, vous pouvez la restaurer via Importer dans Param\u00e8tres.',
+    ok: 'OK',
+    saveOnDevice: 'Sauvegarder sur votre appareil',
+    saveOnDeviceDesc: 'T\u00e9l\u00e9chargez une sauvegarde de toutes vos donn\u00e9es de mariage.',
+    lastSavedOn: 'Derni\u00e8re sauvegarde : '
+  },
+  es: {
+    welcomeTitle: '\u00a1Bienvenida!',
+    welcomeSub: 'Planifiquemos la boda de tus sue\u00f1os',
+    couple: 'Pareja',
+    eventDetails: 'Detalles del evento',
+    budget: 'Presupuesto',
+    language: 'Idioma',
+    letsStart: 'Comencemos a planificar \u2728',
+    errCoupleRequired: 'Por favor, ingrese los nombres de la pareja',
+    errDateRequired: 'Por favor, seleccione una fecha de boda',
+    errVenueRequired: 'Por favor, ingrese el lugar',
+    errBudgetRequired: 'Por favor, ingrese un presupuesto v\u00e1lido',
+    appTitle: 'Mi <span>Boda</span> Planner',
+    navDashboard: 'Panel',
+    navTimeline: 'Cronolog\u00eda',
+    navBudgetTracker: 'Control de presupuesto',
+    navGuests: 'Invitados',
+    navRsvpTracker: 'Control de RSVP',
+    navSettings: 'Configuraci\u00f3n',
+    bigDay: 'El gran d\u00eda',
+    noDateSet: 'Sin fecha definida',
+    noVenue: 'Sin lugar',
+    totalGuests: 'Total invitados',
+    confirmed: 'Confirmados',
+    rsvpRate: 'Tasa de respuesta',
+    tasksDone: 'Tareas completadas',
+    budgetOverview: 'Resumen del presupuesto',
+    total: 'Total',
+    rsvpSummary: 'Resumen de RSVP',
+    invited: 'invitados',
+    noBudgetYet: 'Sin datos de presupuesto. Vaya al control de presupuesto para agregar estimaciones.',
+    noGuestsYet: 'Sin invitados a\u00fan. Agregue su lista para hacer seguimiento a las RSVP.',
+    attending: 'Asistir\u00e1n',
+    pending: 'Pendientes',
+    declined: 'Declinaron',
+    maybe: 'Tal vez',
+    timelineTitle: 'Cronolog\u00eda',
+    timelineSub: 'Siga las tareas de planificaci\u00f3n',
+    tasksOf: 'tareas de',
+    complete: 'completadas',
+    category: 'Categor\u00eda',
+    notes: 'Notas',
+    catAll: 'Todo',
+    name: 'Nombre',
+    type: 'Tipo',
+    contact: 'Contacto',
+    rsvp: 'RSVP',
+    mealPreference: 'Preferencia alimentaria',
+    plusOne: 'Acompa\u00f1ante',
+    plusOneName: 'Nombre del acompa\u00f1ante',
+    notesField: 'Notas',
+    nameRequired: 'El nombre es obligatorio',
+    updated: 'Actualizado',
+    added: 'Agregado',
+    cancel: 'Cancelar',
+    save: 'Guardar',
+    edit: 'Editar',
+    delete: 'Eliminar',
+    yes: 'S\u00ed',
+    noOpt: 'No',
+    none: 'Ninguno',
+    emailOrPhone: 'Correo o tel\u00e9fono',
+    thName: 'Nombre',
+    thType: 'Tipo',
+    thContact: 'Contacto',
+    thRsvp: 'RSVP',
+    thMeal: 'Comida',
+    thPlusOne: 'Acompa\u00f1ante',
+    thActions: 'Acciones',
+    bridesmaid: 'Dama de honor',
+    groomsman: 'Padrino',
+    guest: 'Invitado',
+    family: 'Familia',
+    officiant: 'Oficiante',
+    searchName: 'Buscar nombre...',
+    allTypes: 'Todos los tipos',
+    guestsTitle: 'Invitados',
+    guestsSub: 'Administre su lista de invitados',
+    addGuest: 'Agregar invitado',
+    editGuest: 'Editar invitado',
+    addGuestTitle: 'Agregar invitado',
+    noGuestsList: 'Sin invitados a\u00fan. Agregue su primer invitado.',
+    removeGuest: 'Eliminar',
+    guestRemoved: 'Invitado eliminado',
+    rsvpTrackerTitle: 'Control de RSVP',
+    rsvpTrackerSub: 'Siga las respuestas de sus invitados',
+    totalInvited: 'Total invitados',
+    mealSummary: 'Resumen de comidas',
+    overdueFollowUps: 'Seguimientos atrasados',
+    daysUntilWedding: 'd\u00edas para la boda',
+    noMatchingGuests: 'Sin invitados coincidentes',
+    allFilter: 'Todos',
+    mealChicken: 'Pollo',
+    mealBeef: 'Res',
+    mealFish: 'Pescado',
+    mealVegetarian: 'Vegetariano',
+    mealVegan: 'Vegano',
+    mealOther: 'Otro',
+    budgetTrackerTitle: 'Control de presupuesto',
+    budgetTrackerSub: 'Administre el presupuesto de su boda',
+    totalBudgetLabel: 'Presupuesto total',
+    totalSpent: 'Total gastado',
+    remaining: 'Restante',
+    ofBudgetUsed: '% del presupuesto usado',
+    estimated: 'Estimado',
+    actual: 'Real',
+    difference: 'Diferencia',
+    overBudget: 'Excedido',
+    underBudget: 'Por debajo',
+    budgetUpdated: 'Presupuesto actualizado',
+    catVenueRentals: 'Lugar y alquileres',
+    catCateringBar: 'Catering y barra',
+    catPhotography: 'Fotograf\u00eda',
+    catVideography: 'Video',
+    catFloralsDecor: 'Flores y decoraci\u00f3n',
+    catMusicEntertainment: 'M\u00fasica y entretenimiento',
+    catBridalAttire: 'Vestido de novia',
+    catGroomAttire: 'Traje del novio',
+    catHairMakeup: 'Cabello y maquillaje',
+    catWeddingCake: 'Pastel de bodas',
+    catInvitationsStationery: 'Invitaciones y papeler\u00eda',
+    catTransportation: 'Transporte',
+    catOfficiant: 'Oficiante',
+    catMiscellaneous: 'Varios',
+    vCatAll: 'Todos',
+    time: 'Hora',
+    notSet: 'Sin definir',
+    settingsTitle: 'Configuraci\u00f3n',
+    settingsSub: 'Administre la configuraci\u00f3n de su boda',
+    weddingDetails: 'Detalles de la boda',
+    coupleNames: 'Nombres de la pareja',
+    weddingDate: 'Fecha de la boda',
+    venueSetting: 'Lugar',
+    editDetails: 'Editar detalles',
+    dataManagement: 'Gesti\u00f3n de datos',
+    exportData: 'Exportar datos',
+    importData: 'Importar datos',
+    dangerZone: 'Zona de peligro',
+    dangerZoneText: 'Esta acci\u00f3n no se puede deshacer. Todos los datos se eliminar\u00e1n permanentemente.',
+    resetAllData: 'Restablecer todos los datos',
+    resetConfirm: '\u00bfEst\u00e1 seguro de que desea restablecer todos los datos?',
+    dataExported: 'Datos exportados exitosamente',
+    dataImported: 'Datos importados exitosamente',
+    invalidImport: 'Archivo de importaci\u00f3n inv\u00e1lido',
+    tlPeriod12: '12+ meses o m\u00e1s',
+    tlPeriod9: '9-12 meses',
+    tlPeriod6: '6-9 meses',
+    tlPeriod4: '4-6 meses',
+    tlPeriod3: '3-4 meses',
+    tlPeriod2: '2-3 meses',
+    tlPeriod1: '1-2 meses',
+    tlPeriodWeek: 'Semana de la boda',
+    tlSetBudget: 'Definir el presupuesto',
+    tlCreateGuestList: 'Crear la lista de invitados',
+    tlResearchVenues: 'Investigar lugares',
+    tlStartVendorSearch: 'Iniciar b\u00fasqueda de proveedores',
+    tlBookVenue: 'Reservar el lugar',
+    tlHirePhotographer: 'Contratar fot\u00f3grafo',
+    tlChooseBridalParty: 'Elegir el cortejo nupcial',
+    tlBookEntertainment: 'Reservar entretenimiento',
+    tlBookCaterer: 'Reservar catering',
+    tlSelectFlorist: 'Elegir florista',
+    tlOrderDress: 'Encargar el vestido',
+    tlPlanHoneymoon: 'Planificar la luna de miel',
+    tlSendSaveTheDates: 'Enviar save-the-dates',
+    tlBookOfficiant: 'Reservar oficiante',
+    tlArrangeTransportation: 'Organizar transporte',
+    tlStartRegistry: 'Crear lista de regalos',
+    tlOrderInvitations: 'Encargar invitaciones',
+    tlBookHairMakeup: 'Reservar peluquer\u00eda/maquillaje',
+    tlPlanRehearsalDinner: 'Planificar la cena de ensayo',
+    tlScheduleFittings: 'Programar pruebas de vestido',
+    tlSendInvitations: 'Enviar invitaciones',
+    tlFinalizeMenu: 'Finalizar el men\u00fa',
+    tlConfirmVendors: 'Confirmar proveedores',
+    tlPlanSeatingChart: 'Planificar la mesa',
+    tlFinalDressFitting: 'Prueba final del vestido',
+    tlMarriageLicense: 'Licencia de matrimonio',
+    tlRehearsalTimeline: 'Cronograma del ensayo',
+    tlFinalizeDetails: 'Finalizar detalles',
+    tlConfirmAllVendors: 'Confirmar todos los proveedores',
+    tlPrepareSeatingCards: 'Preparar tarjetas de mesa',
+    tlWeddingRehearsal: 'Ensayo de la boda',
+    tlRehearsalDinner: 'Cena de ensayo',
+    tlGetBeautyTreatments: 'Tratamientos de belleza',
+    tlPackForHoneymoon: 'Preparar maletas para la luna de miel',
+    tlSetUpVenue: 'Preparar el lugar',
+    tlFinalWalkthrough: 'Recorrido final',
+    tlAddTask: 'A\u00f1adir tarea',
+    tlDeleteTask: 'Eliminar',
+    tlDeleteTaskConfirm: '\u00bfEliminar esta tarea?',
+    tlTaskDeleted: 'Tarea eliminada',
+    tlAddTaskTitle: 'A\u00f1adir tarea',
+    tlTaskText: 'Descripci\u00f3n de la tarea',
+    tlTaskPeriod: 'Per\u00edodo',
+    tlTaskRequired: 'La descripci\u00f3n de la tarea es obligatoria',
+    tlCustom: 'Personalizado',
+    tlNotesTitle: 'Notas',
+    tlNotesSub: 'Anota tus ideas y recordatorios',
+    tlAddNote: 'A\u00f1adir nota',
+    tlNoteText: 'Escribe tu nota aqu\u00ed...',
+    tlNoteRequired: 'El texto de la nota es obligatorio',
+    tlNoteAdded: 'Nota a\u00f1adida',
+    tlDeleteNote: 'Eliminar',
+    tlDeleteNoteConfirm: '\u00bfEliminar esta nota?',
+    tlNoteDeleted: 'Nota eliminada',
+    tlNoNotesYet: 'A\u00fan no hay notas. \u00a1Escribe tu primera nota!',
+    tlSelectPeriod: 'Seleccionar un per\u00edodo',
+    months: 'Enero,Febrero,Marzo,Abril,Mayo,Junio,Julio,Agosto,Septiembre,Octubre,Noviembre,Diciembre',
+    rsvpPending: 'Pendiente',
+    rsvpAttending: 'Asistir\u00e1n',
+    rsvpDeclined: 'Rechazaron',
+    rsvpMaybe: 'Quiz\u00e1s',
+    over: 'sobrepasado',
+    under: 'debajo',
+    resetEverything: 'Restablecer todo',
+    dataReset: 'Todos los datos han sido restablecidos',
+    editWeddingDetails: 'Editar detalles de la boda',
+    coupleNamesRequired: 'Los nombres de la pareja son obligatorios',
+    invalidDate: 'Fecha inv\u00e1lida',
+    detailsUpdated: '\u00a1Detalles actualizados!',
+    noGuestsYetTable: 'A\u00fan no hay invitados',
+    removeGuestConfirm: '\u00bfEliminar este invitado?',
+    dangerZoneText: 'Esto eliminar\u00e1 permanentemente todos sus datos de planificaci\u00f3n de bodas y no se puede deshacer.',
+    resetModalText: '\u00bfEst\u00e1 seguro de que desea eliminar todos sus datos de planificaci\u00f3n de bodas? Esta acci\u00f3n no se puede deshacer.',
+    invalidFileFormat: 'Formato de archivo inv\u00e1lido',
+    timelineSub: 'Realice un seguimiento de sus tareas de planificaci\u00f3n',
+    saveFailed: '\u00a1No se pudo guardar tus datos! Exporta una copia de seguridad inmediatamente.',
+    storageFull: 'El almacenamiento est\u00e1 lleno. Elimina im\u00e1genes del tablero de inspiraci\u00f3n e intenta de nuevo.',
+    lastSaved: '\u00daltima guardado:',
+    justNow: 'ahora mismo',
+    secondsAgo: 'hace {n} segundos',
+    minutesAgo: 'hace {n} minutos',
+    hoursAgo: 'hace {n} horas',
+    daysAgo: 'hace {n} d\u00edas',
+    never: 'Nunca',
+    backupReminderText: '\u00a1Ha pasado un tiempo desde tu \u00faltima copia de seguridad! Exporta tus datos para mantenerlos seguros.',
+    backupExportNow: 'Exportar',
+    backupDismiss: 'Recordar m\u00e1s tarde',
+    dataHealth: 'Salud de datos',
+    lastBackup: '\u00daltima copia de seguridad',
+    dataCorruptedTitle: 'Recuperaci\u00f3n de datos',
+    dataCorruptedText: 'No pudimos cargar tus datos guardados. Es posible que est\u00e9n corruptos.',
+    dataCorruptedHint: 'Si exportaste una copia de seguridad, puedes restaurarla desde Importar en Configuraci\u00f3n.',
+    ok: 'Aceptar',
+    saveOnDevice: 'Guardar en tu dispositivo',
+    saveOnDeviceDesc: 'Descarga una copia de seguridad con todos tus datos de boda.',
+    lastSavedOn: '\u00daltima guardado: '
+  },
+  de: {
+    welcomeTitle: 'Willkommen!',
+    welcomeSub: 'Planen Sie Ihren Traumhochzeitstag',
+    couple: 'Paar',
+    eventDetails: 'Veranstaltungsdetails',
+    budget: 'Budget',
+    language: 'Sprache',
+    letsStart: 'Beginnen wir mit der Planung \u2728',
+    errCoupleRequired: 'Bitte geben Sie die Namen des Paares ein',
+    errDateRequired: 'Bitte w\u00e4hlen Sie ein Hochzeitsdatum',
+    errVenueRequired: 'Bitte geben Sie den Veranstaltungsort ein',
+    errBudgetRequired: 'Bitte geben Sie ein g\u00fcltiges Budget ein',
+    appTitle: 'Meine <span>Hochzeit</span> Planung',
+    navDashboard: '\u00dcbersicht',
+    navTimeline: 'Zeitplan',
+    navBudgetTracker: 'Budgetverfolgung',
+    navGuests: 'G\u00e4ste',
+    navRsvpTracker: 'RSVP-Verfolgung',
+    navSettings: 'Einstellungen',
+    bigDay: 'Der gro\u00dfe Tag',
+    noDateSet: 'Kein Datum festgelegt',
+    noVenue: 'Kein Veranstaltungsort',
+    totalGuests: 'G\u00e4ste gesamt',
+    confirmed: 'Best\u00e4tigt',
+    rsvpRate: 'R\u00fcckmeldungsrate',
+    tasksDone: 'Aufgaben erledigt',
+    budgetOverview: 'Budget\u00fcbersicht',
+    total: 'Gesamt',
+    rsvpSummary: 'RSVP-\u00dcbersicht',
+    invited: 'eingeladen',
+    noBudgetYet: 'Noch keine Budgetdaten. Gehen Sie zur Budgetverfolgung, um Sch\u00e4tzungen hinzuzuf\u00fcgen!',
+    noGuestsYet: 'Noch keine G\u00e4ste. F\u00fcgen Sie Ihre G\u00e4steliste hinzu, um RSVPs zu verfolgen!',
+    attending: 'Zusage',
+    pending: 'Ausstehend',
+    declined: 'Absage',
+    maybe: 'Vielleicht',
+    timelineTitle: 'Zeitplan',
+    timelineSub: 'Verfolgen Sie Ihre Planungsaufgaben',
+    tasksOf: 'Aufgaben von',
+    complete: 'erledigt',
+    category: 'Kategorie',
+    notes: 'Notizen',
+    catAll: 'Alle',
+    name: 'Name',
+    type: 'Typ',
+    contact: 'Kontakt',
+    rsvp: 'RSVP',
+    mealPreference: 'Essenspr\u00e4ferenz',
+    plusOne: 'Begleitperson',
+    plusOneName: 'Name der Begleitperson',
+    notesField: 'Notizen',
+    nameRequired: 'Name ist erforderlich',
+    updated: 'Aktualisiert',
+    added: 'Hinzugef\u00fcgt',
+    cancel: 'Abbrechen',
+    save: 'Speichern',
+    edit: 'Bearbeiten',
+    delete: 'L\u00f6schen',
+    yes: 'Ja',
+    noOpt: 'Nein',
+    none: 'Keine',
+    emailOrPhone: 'E-Mail oder Telefon',
+    thName: 'Name',
+    thType: 'Typ',
+    thContact: 'Kontakt',
+    thRsvp: 'RSVP',
+    thMeal: 'Essen',
+    thPlusOne: 'Begleitung',
+    thActions: 'Aktionen',
+    bridesmaid: 'Brautjungfer',
+    groomsman: 'Br\u00e4utigam',
+    guest: 'Gast',
+    family: 'Familie',
+    officiant: 'Offiziant',
+    searchName: 'Name suchen...',
+    allTypes: 'Alle Typen',
+    guestsTitle: 'G\u00e4ste',
+    guestsSub: 'Verwalten Sie Ihre G\u00e4steliste',
+    addGuest: 'Gast hinzuf\u00fcgen',
+    editGuest: 'Gast bearbeiten',
+    addGuestTitle: 'Gast hinzuf\u00fcgen',
+    noGuestsList: 'Noch keine G\u00e4ste. F\u00fcgen Sie Ihren ersten Gast hinzu!',
+    removeGuest: 'Entfernen',
+    guestRemoved: 'Gast entfernt',
+    rsvpTrackerTitle: 'RSVP-Verfolgung',
+    rsvpTrackerSub: 'Verfolgen Sie die R\u00fcckmeldungen Ihrer G\u00e4ste',
+    totalInvited: 'Gesamt eingeladen',
+    mealSummary: 'Essens\u00fcbersicht',
+    overdueFollowUps: '\u00dcberf\u00e4llige Nachfassaktionen',
+    daysUntilWedding: 'Tage bis zur Hochzeit',
+    noMatchingGuests: 'Keine passenden G\u00e4ste',
+    allFilter: 'Alle',
+    mealChicken: 'H\u00e4hnchen',
+    mealBeef: 'Rindfleisch',
+    mealFish: 'Fisch',
+    mealVegetarian: 'Vegetarisch',
+    mealVegan: 'Vegan',
+    mealOther: 'Sonstiges',
+    budgetTrackerTitle: 'Budgetverfolgung',
+    budgetTrackerSub: 'Verwalten Sie Ihr Hochzeitsbudget',
+    totalBudgetLabel: 'Gesamtbudget',
+    totalSpent: 'Gesamtausgaben',
+    remaining: 'Verbleibend',
+    ofBudgetUsed: '% des Budgets verwendet',
+    estimated: 'Gesch\u00e4tzt',
+    actual: 'Tats\u00e4chlich',
+    difference: 'Differenz',
+    overBudget: '\u00dcber Budget',
+    underBudget: 'Unter Budget',
+    budgetUpdated: 'Budget aktualisiert',
+    catVenueRentals: 'Veranstaltungsort & Miete',
+    catCateringBar: 'Catering & Bar',
+    catPhotography: 'Fotografie',
+    catVideography: 'Videografie',
+    catFloralsDecor: 'Blumen & Dekoration',
+    catMusicEntertainment: 'Musik & Unterhaltung',
+    catBridalAttire: 'Brautkleid',
+    catGroomAttire: 'Anzug des Br\u00e4utigams',
+    catHairMakeup: 'Haare & Make-up',
+    catWeddingCake: 'Hochzeitstorte',
+    catInvitationsStationery: 'Einladungen & Papierwaren',
+    catTransportation: 'Transport',
+    catOfficiant: 'Offiziant',
+    catMiscellaneous: 'Sonstiges',
+    vCatAll: 'Alle',
+    time: 'Uhrzeit',
+    notSet: 'Nicht festgelegt',
+    settingsTitle: 'Einstellungen',
+    settingsSub: 'Verwalten Sie Ihre Hochzeitseinstellungen',
+    weddingDetails: 'Hochzeitsdetails',
+    coupleNames: 'Namen des Paares',
+    weddingDate: 'Hochzeitsdatum',
+    venueSetting: 'Veranstaltungsort',
+    editDetails: 'Details bearbeiten',
+    dataManagement: 'Datenverwaltung',
+    exportData: 'Daten exportieren',
+    importData: 'Daten importieren',
+    dangerZone: 'Gefahrenzone',
+    dangerZoneText: 'Diese Aktion kann nicht r\u00fcckg\u00e4ngig gemacht werden. Alle Daten werden dauerhaft gel\u00f6scht.',
+    resetAllData: 'Alle Daten zur\u00fccksetzen',
+    resetConfirm: 'Sind Sie sicher, dass Sie alle Daten zur\u00fccksetzen m\u00f6chten?',
+    dataExported: 'Daten erfolgreich exportiert',
+    dataImported: 'Daten erfolgreich importiert',
+    invalidImport: 'Ung\u00fcltige Importdatei',
+    tlPeriod12: '12+ Monate vorher',
+    tlPeriod9: '9-12 Monate vorher',
+    tlPeriod6: '6-9 Monate vorher',
+    tlPeriod4: '4-6 Monate vorher',
+    tlPeriod3: '3-4 Monate vorher',
+    tlPeriod2: '2-3 Monate vorher',
+    tlPeriod1: '1-2 Monate vorher',
+    tlPeriodWeek: 'Hochzeitswoche',
+    tlSetBudget: 'Budget festlegen',
+    tlCreateGuestList: 'G\u00e4steliste erstellen',
+    tlResearchVenues: 'Veranstaltungsorte recherchieren',
+    tlStartVendorSearch: 'Anbietersuche starten',
+    tlBookVenue: 'Veranstaltungsort buchen',
+    tlHirePhotographer: 'Fotografen beauftragen',
+    tlChooseBridalParty: 'Brautp\u00e4rchen w\u00e4hlen',
+    tlBookEntertainment: 'Musik/Show buchen',
+    tlBookCaterer: 'Caterer buchen',
+    tlSelectFlorist: 'Floristen w\u00e4hlen',
+    tlOrderDress: 'Kleid bestellen',
+    tlPlanHoneymoon: 'Flitterwochen planen',
+    tlSendSaveTheDates: 'Save-the-Dates verschicken',
+    tlBookOfficiant: 'Offizianten buchen',
+    tlArrangeTransportation: 'Transport organisieren',
+    tlStartRegistry: 'Geschenkliste erstellen',
+    tlOrderInvitations: 'Einladungen bestellen',
+    tlBookHairMakeup: 'Friseur/Make-up buchen',
+    tlPlanRehearsalDinner: 'Probedinner planen',
+    tlScheduleFittings: 'Anproben terminieren',
+    tlSendInvitations: 'Einladungen verschicken',
+    tlFinalizeMenu: 'Men\u00fc finalisieren',
+    tlConfirmVendors: 'Anbieter best\u00e4tigen',
+    tlPlanSeatingChart: 'Sitzplan planen',
+    tlFinalDressFitting: 'Letzte Anprobe',
+    tlMarriageLicense: 'Standesamtliche Trauung',
+    tlRehearsalTimeline: 'Ablaufplan Probe',
+    tlFinalizeDetails: 'Details finalisieren',
+    tlConfirmAllVendors: 'Alle Anbieter best\u00e4tigen',
+    tlPrepareSeatingCards: 'Sitzkarten vorbereiten',
+    tlWeddingRehearsal: 'Hochzeitsprobe',
+    tlRehearsalDinner: 'Probedinner',
+    tlGetBeautyTreatments: 'Kosmetikbehandlungen',
+    tlPackForHoneymoon: 'Koffer packen',
+    tlSetUpVenue: 'Saal einrichten',
+    tlFinalWalkthrough: 'Letzte Begehung',
+    tlAddTask: 'Aufgabe hinzuf\u00fcgen',
+    tlDeleteTask: 'L\u00f6schen',
+    tlDeleteTaskConfirm: 'Diese Aufgabe l\u00f6schen?',
+    tlTaskDeleted: 'Aufgabe gel\u00f6scht',
+    tlAddTaskTitle: 'Aufgabe hinzuf\u00fcgen',
+    tlTaskText: 'Aufgabenbeschreibung',
+    tlTaskPeriod: 'Zeitraum',
+    tlTaskRequired: 'Aufgabenbeschreibung ist erforderlich',
+    tlCustom: 'Benutzerdefiniert',
+    tlNotesTitle: 'Notizen',
+    tlNotesSub: 'Notieren Sie Ihre Ideen und Erinnerungen',
+    tlAddNote: 'Notiz hinzuf\u00fcgen',
+    tlNoteText: 'Schreiben Sie Ihre Notiz hier...',
+    tlNoteRequired: 'Notiztext ist erforderlich',
+    tlNoteAdded: 'Notiz hinzugef\u00fcgt',
+    tlDeleteNote: 'L\u00f6schen',
+    tlDeleteNoteConfirm: 'Diese Notiz l\u00f6schen?',
+    tlNoteDeleted: 'Notiz gel\u00f6scht',
+    tlNoNotesYet: 'Noch keine Notizen. Schreiben Sie Ihre erste Notiz!',
+    tlSelectPeriod: 'Zeitraum w\u00e4hlen',
+    months: 'Januar,Februar,M\u00e4rz,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember',
+    rsvpPending: 'Ausstehend',
+    rsvpAttending: 'Zusagen',
+    rsvpDeclined: 'Absagen',
+    rsvpMaybe: 'Vielleicht',
+    over: '\u00fcber',
+    under: 'unter',
+    resetEverything: 'Alles zur\u00fccksetzen',
+    dataReset: 'Alle Daten wurden zur\u00fcckgesetzt',
+    editWeddingDetails: 'Hochzeitsdetails bearbeiten',
+    coupleNamesRequired: 'Die Namen des Paares sind erforderlich',
+    invalidDate: 'Ung\u00fcltiges Datum',
+    detailsUpdated: 'Details aktualisiert!',
+    noGuestsYetTable: 'Noch keine G\u00e4ste',
+    removeGuestConfirm: 'Diesen Gast entfernen?',
+    dangerZoneText: 'Dadurch werden alle Ihre Hochzeitsplanungsdaten dauerhaft gel\u00f6scht und k\u00f6nnen nicht r\u00fcckg\u00e4ngig gemacht werden.',
+    resetModalText: 'Sind Sie sicher, dass Sie alle Ihre Hochzeitsplanungsdaten l\u00f6schen m\u00f6chten? Diese Aktion kann nicht r\u00fcckg\u00e4ngig gemacht werden.',
+    invalidFileFormat: 'Ung\u00fcltiges Dateiformat',
+    timelineSub: 'Verfolgen Sie Ihre Planungsaufgaben',
+    saveFailed: 'Daten konnten nicht gespeichert werden! Bitte sofort eine Sicherung exportieren.',
+    storageFull: 'Speicher ist voll. Entfernen Sie einige Mood-Board-Bilder und versuchen Sie es erneut.',
+    lastSaved: 'Zuletzt gespeichert:',
+    justNow: 'gerade eben',
+    secondsAgo: 'vor {n} Sekunden',
+    minutesAgo: 'vor {n} Minuten',
+    hoursAgo: 'vor {n} Stunden',
+    daysAgo: 'vor {n} Tagen',
+    never: 'Nie',
+    backupReminderText: 'Es ist schon eine Weile her, seit Ihrer letzten Sicherung. Exportieren Sie Ihre Daten!',
+    backupExportNow: 'Exportieren',
+    backupDismiss: 'Sp\u00e4ter erinnern',
+    dataHealth: 'Datenstatus',
+    lastBackup: 'Letzte Sicherung',
+    dataCorruptedTitle: 'Datenwiederherstellung',
+    dataCorruptedText: 'Ihre gespeicherten Daten konnten nicht geladen werden. M\u00f6glicherweise sind sie besch\u00e4digt.',
+    dataCorruptedHint: 'Wenn Sie zuvor eine Sicherung exportiert haben, k\u00f6nnen Sie diese \u00fcber Importieren in den Einstellungen wiederherstellen.',
+    ok: 'OK',
+    saveOnDevice: 'Auf Ger\u00e4t speichern',
+    saveOnDeviceDesc: 'Laden Sie eine Sicherung aller Hochzeitsdaten herunter.',
+    lastSavedOn: 'Zuletzt gespeichert: '
+  },
+  nl: {
+    welcomeTitle: 'Welkom!',
+    welcomeSub: 'Laten we je droombruiloft plannen',
+    couple: 'Paar',
+    eventDetails: 'Evenementsdetails',
+    budget: 'Budget',
+    language: 'Taal',
+    letsStart: 'Laten we beginnen met plannen \u2728',
+    errCoupleRequired: 'Voer de namen van het paar in',
+    errDateRequired: 'Selecteer een trouwdatum',
+    errVenueRequired: 'Voer de locatie in',
+    errBudgetRequired: 'Voer een geldig budgetbedrag in',
+    appTitle: 'Mijn <span>Trouw</span> Planner',
+    navDashboard: 'Overzicht',
+    navTimeline: 'Tijdlijn',
+    navBudgetTracker: 'Budgetbeheer',
+    navGuests: 'Gasten',
+    navRsvpTracker: 'RSVP Tracker',
+    navSettings: 'Instellingen',
+    bigDay: 'De Grote Dag',
+    noDateSet: 'Geen datum ingesteld',
+    noVenue: 'Geen locatie',
+    totalGuests: 'Totaal aantal gasten',
+    confirmed: 'Bevestigd',
+    rsvpRate: 'RSVP-percentage',
+    tasksDone: 'Taken voltooid',
+    budgetOverview: 'Budgetoverzicht',
+    total: 'Totaal',
+    rsvpSummary: 'RSVP-overzicht',
+    invited: 'uitgenodigd',
+    noBudgetYet: 'Nog geen budgetgegevens. Ga naar Budgetbeheer om schattingen toe te voegen!',
+    noGuestsYet: 'Nog geen gasten. Voeg je gastenlijst toe om RSVP\u2019s bij te houden!',
+    attending: 'Aanwezig',
+    pending: 'In afwachting',
+    declined: 'Afgewezen',
+    maybe: 'Misschien',
+    timelineTitle: 'Tijdlijn',
+    timelineSub: 'Volg je trouwplanningstaken',
+    tasksOf: 'taken van',
+    complete: 'voltooid',
+    category: 'Categorie',
+    notes: 'Notities',
+    catAll: 'Alles',
+    name: 'Naam',
+    type: 'Type',
+    contact: 'Contact',
+    rsvp: 'RSVP',
+    mealPreference: 'Dieetwens',
+    plusOne: 'Plus-one',
+    plusOneName: 'Naam plus-one',
+    notesField: 'Notities',
+    nameRequired: 'Naam is verplicht',
+    updated: 'Bijgewerkt',
+    added: 'Toegevoegd',
+    cancel: 'Annuleren',
+    save: 'Opslaan',
+    edit: 'Bewerken',
+    delete: 'Verwijderen',
+    yes: 'Ja',
+    noOpt: 'Nee',
+    none: 'Geen',
+    emailOrPhone: 'E-mail of telefoon',
+    thName: 'Naam',
+    thType: 'Type',
+    thContact: 'Contact',
+    thRsvp: 'RSVP',
+    thMeal: 'Maaltijd',
+    thPlusOne: 'Plus-one',
+    thActions: 'Acties',
+    bridesmaid: 'Bruidsmeisje',
+    groomsman: 'Bruidegom',
+    guest: 'Gast',
+    family: 'Familie',
+    officiant: 'Officiant',
+    searchName: 'Naam zoeken...',
+    allTypes: 'Alle types',
+    guestsTitle: 'Gasten',
+    guestsSub: 'Beheer je gastenlijst',
+    addGuest: 'Gast toevoegen',
+    editGuest: 'Gast bewerken',
+    addGuestTitle: 'Gast toevoegen',
+    noGuestsList: 'Nog geen gasten. Voeg je eerste gast toe!',
+    removeGuest: 'Verwijderen',
+    guestRemoved: 'Gast verwijderd',
+    rsvpTrackerTitle: 'RSVP Tracker',
+    rsvpTrackerSub: 'Volg de reacties van je gasten',
+    totalInvited: 'Totaal uitgenodigd',
+    mealSummary: 'Maaltijdoverzicht',
+    overdueFollowUps: 'Achterstallige opvolgingen',
+    daysUntilWedding: 'dagen tot de bruiloft',
+    noMatchingGuests: 'Geen overeenkomende gasten',
+    allFilter: 'Alles',
+    mealChicken: 'Kip',
+    mealBeef: 'Rundvlees',
+    mealFish: 'Vis',
+    mealVegetarian: 'Vegetarisch',
+    mealVegan: 'Veganistisch',
+    mealOther: 'Overig',
+    budgetTrackerTitle: 'Budgetbeheer',
+    budgetTrackerSub: 'Beheer je trouwbudget',
+    totalBudgetLabel: 'Totaalbudget',
+    totalSpent: 'Totaal uitgegeven',
+    remaining: 'Resterend',
+    ofBudgetUsed: '% van budget gebruikt',
+    estimated: 'Geschat',
+    actual: 'Werkelijk',
+    difference: 'Verschil',
+    overBudget: 'Over budget',
+    underBudget: 'Onder budget',
+    budgetUpdated: 'Budget bijgewerkt',
+    catVenueRentals: 'Locatie & Verhuur',
+    catCateringBar: 'Catering & Bar',
+    catPhotography: 'Fotografie',
+    catVideography: 'Videografie',
+    catFloralsDecor: 'Bloemen & Decoratie',
+    catMusicEntertainment: 'Muziek & Entertainment',
+    catBridalAttire: 'Bruidskleding',
+    catGroomAttire: 'Kleding bruidegom',
+    catHairMakeup: 'Haar & Make-up',
+    catWeddingCake: 'Bruiloftstaart',
+    catInvitationsStationery: 'Uitnodigingen & Briefpapier',
+    catTransportation: 'Vervoer',
+    catOfficiant: 'Officiant',
+    catMiscellaneous: 'Diversen',
+    vCatAll: 'Alles',
+    time: 'Tijd',
+    notSet: 'Niet ingesteld',
+    settingsTitle: 'Instellingen',
+    settingsSub: 'Beheer je trouwinstellingen',
+    weddingDetails: 'Trouwdetails',
+    coupleNames: 'Namen van het paar',
+    weddingDate: 'Trouwdatum',
+    venueSetting: 'Locatie',
+    editDetails: 'Details bewerken',
+    dataManagement: 'Gegevensbeheer',
+    exportData: 'Gegevens exporteren',
+    importData: 'Gegevens importeren',
+    dangerZone: 'Gevarenzone',
+    dangerZoneText: 'Deze actie kan niet ongedaan worden gemaakt. Alle gegevens worden permanent verwijderd.',
+    resetAllData: 'Alle gegevens resetten',
+    resetConfirm: 'Weet je zeker dat je alle gegevens wilt resetten?',
+    dataExported: 'Gegevens succesvol ge\u00ebxporteerd',
+    dataImported: 'Gegevens succesvol ge\u00efmporteerd',
+    invalidImport: 'Ongeldig importbestand',
+    rsvpPending: 'In afwachting',
+    rsvpAttending: 'Aanwezig',
+    rsvpDeclined: 'Afgewezen',
+    rsvpMaybe: 'Misschien',
+    over: 'over',
+    under: 'onder',
+    resetEverything: 'Alles resetten',
+    dataReset: 'Alle gegevens zijn gereset',
+    editWeddingDetails: 'Trouwdetails bewerken',
+    coupleNamesRequired: 'De namen van het paar zijn verplicht',
+    invalidDate: 'Ongeldige datum',
+    detailsUpdated: 'Details bijgewerkt!',
+    noGuestsYetTable: 'Nog geen gasten',
+    removeGuestConfirm: 'Deze gast verwijderen?',
+    resetModalText: 'Weet je zeker dat je al je trouwplanningsgegevens wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.',
+    invalidFileFormat: 'Ongeldig bestandsformaat',
+    timelineSub: 'Volg je trouwplanningsvoortgang',
+    tlPeriod12: '12+ maanden of meer',
+    tlPeriod9: '9-12 maanden',
+    tlPeriod6: '6-9 maanden',
+    tlPeriod4: '4-6 maanden',
+    tlPeriod3: '3-4 maanden',
+    tlPeriod2: '2-3 maanden',
+    tlPeriod1: '1-2 maanden',
+    tlPeriodWeek: 'Trouwweek',
+    tlSetBudget: 'Budget vaststellen',
+    tlCreateGuestList: 'Gastenlijst maken',
+    tlResearchVenues: 'Locaties onderzoeken',
+    tlStartVendorSearch: 'Leveranciers zoeken',
+    tlBookVenue: 'Locatie boeken',
+    tlHirePhotographer: 'Fotograaf inhuren',
+    tlChooseBridalParty: 'Bruidspartij kiezen',
+    tlBookEntertainment: 'Entertainment boeken',
+    tlBookCaterer: 'Cateraar boeken',
+    tlSelectFlorist: 'Bloemist kiezen',
+    tlOrderDress: 'Jurk bestellen',
+    tlPlanHoneymoon: 'Huwelijksreis plannen',
+    tlSendSaveTheDates: 'Save-the-dates versturen',
+    tlBookOfficiant: 'Officiant boeken',
+    tlArrangeTransportation: 'Vervoer regelen',
+    tlStartRegistry: 'Verlanglijst aanmaken',
+    tlOrderInvitations: 'Uitnodigingen bestellen',
+    tlBookHairMakeup: 'Kapper/grimeur boeken',
+    tlPlanRehearsalDinner: 'Repetitiediner plannen',
+    tlScheduleFittings: 'Pashorizon plannen',
+    tlSendInvitations: 'Uitnodigingen versturen',
+    tlFinalizeMenu: 'Menu definitief maken',
+    tlConfirmVendors: 'Leveranciers bevestigen',
+    tlPlanSeatingChart: 'Zitplan plannen',
+    tlFinalDressFitting: 'Laatste pasbeurt',
+    tlMarriageLicense: 'Huwelijksakte',
+    tlRehearsalTimeline: 'Repetitie planning',
+    tlFinalizeDetails: 'Details afronden',
+    tlConfirmAllVendors: 'Alle leveranciers bevestigen',
+    tlPrepareSeatingCards: 'Naamkaartjes maken',
+    tlWeddingRehearsal: 'Trouwrepetitie',
+    tlRehearsalDinner: 'Repetitiediner',
+    tlGetBeautyTreatments: 'Beautybehandelingen',
+    tlPackForHoneymoon: 'Koffer pakken voor huwelijksreis',
+    tlSetUpVenue: 'Locatie inrichten',
+    tlFinalWalkthrough: 'Laatste rondgang',
+    tlAddTask: 'Taak toevoegen',
+    tlDeleteTask: 'Verwijderen',
+    tlDeleteTaskConfirm: 'Deze taak verwijderen?',
+    tlTaskDeleted: 'Taak verwijderd',
+    tlAddTaskTitle: 'Taak toevoegen',
+    tlTaskText: 'Taakbeschrijving',
+    tlTaskPeriod: 'Periode',
+    tlTaskRequired: 'Taakbeschrijving is verplicht',
+    tlCustom: 'Aangepast',
+    tlNotesTitle: 'Notities',
+    tlNotesSub: 'Schrijf je idee\u00ebn en herinneringen op',
+    tlAddNote: 'Notitie toevoegen',
+    tlNoteText: 'Schrijf je notitie hier...',
+    tlNoteRequired: 'Notitietekst is verplicht',
+    tlNoteAdded: 'Notitie toegevoegd',
+    tlDeleteNote: 'Verwijderen',
+    tlDeleteNoteConfirm: 'Deze notitie verwijderen?',
+    tlNoteDeleted: 'Notitie verwijderd',
+    tlNoNotesYet: 'Nog geen notities. Schrijf je eerste notitie!',
+    tlSelectPeriod: 'Selecteer een periode',
+    months: 'Januari,Februari,Maart,April,Mei,Juni,Juli,Augustus,September,Oktober,November,December',
+    saveFailed: 'Je gegevens konden niet worden opgeslagen! Exporteer onmiddellijk een back-up.',
+    storageFull: 'Opslag is vol. Verwijder enkele moodboard-afbeeldingen en probeer opnieuw.',
+    lastSaved: 'Laatst opgeslagen:',
+    justNow: 'zojuist',
+    secondsAgo: '{n} seconden geleden',
+    minutesAgo: '{n} minuten geleden',
+    hoursAgo: '{n} uur geleden',
+    daysAgo: '{n} dagen geleden',
+    never: 'Nooit',
+    backupReminderText: 'Het is al een tijdje geleden sinds je laatste back-up. Exporteer je gegevens om ze veilig te houden!',
+    backupExportNow: 'Exporteren',
+    backupDismiss: 'Herinner me later',
+    dataHealth: 'Gegevensstatus',
+    lastBackup: 'Laatste back-up',
+    dataCorruptedTitle: 'Gegevensherstel',
+    dataCorruptedText: 'We konden je opgeslagen gegevens niet laden. Ze zijn mogelijk beschadigd.',
+    dataCorruptedHint: 'Als je eerder een back-up hebt ge\u00ebxporteerd, kun je deze herstellen via Importeren in Instellingen.',
+    ok: 'OK',
+    saveOnDevice: 'Opslaan op je apparaat',
+    saveOnDeviceDesc: 'Download een back-up van al je trouwgegevens om ze veilig te houden.',
+    lastSavedOn: 'Laatst opgeslagen: '
+  }
+};
+
+function t(key) {
+  var lang = TRANSLATIONS[currentLang];
+  if (lang && lang[key] !== undefined) return lang[key];
+  var en = TRANSLATIONS.en;
+  if (en && en[key] !== undefined) return en[key];
+  return key;
+}
+
+function setLanguage(lang) {
+  if (!TRANSLATIONS[lang]) lang = 'en';
+  currentLang = lang;
+  appData.language = lang;
+  saveData();
+}
+
+var budgetCatMap = {
+  'Venue & Rentals': 'catVenueRentals',
+  'Catering & Bar': 'catCateringBar',
+  'Photography': 'catPhotography',
+  'Videography': 'catVideography',
+  'Florals & Decor': 'catFloralsDecor',
+  'Music & Entertainment': 'catMusicEntertainment',
+  'Bridal Attire': 'catBridalAttire',
+  "Groom's Attire": 'catGroomAttire',
+  'Hair & Makeup': 'catHairMakeup',
+  'Wedding Cake': 'catWeddingCake',
+  'Invitations & Stationery': 'catInvitationsStationery',
+  'Transportation': 'catTransportation',
+  'Officiant': 'catOfficiant',
+  'Miscellaneous': 'catMiscellaneous'
+};
+
+function fmtDate(dateStr) {
+  if (!dateStr) return t('noDateSet');
+  var d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return t('noDateSet');
+  var months = t('months').split(',');
+  return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+}
+
+// =============================================
+// MODAL
+// =============================================
+
+function showModal(html) {
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.getElementById('modalContent').innerHTML = '';
+}
+
+// =============================================
+// TOAST
+// =============================================
+
+function showToast(message, type) {
+  var t = type || 'info';
+  var container = document.getElementById('toastContainer');
+  var el = document.createElement('div');
+  el.className = 'toast ' + t;
+  el.textContent = message;
+  container.appendChild(el);
+  setTimeout(function() {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(40px)';
+    el.style.transition = 'all 0.3s ease';
+    setTimeout(function() {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 300);
+  }, 2800);
+}
+
+// =============================================
+// NAV & SECTIONS
+// =============================================
+
+var navItems = [
+  { key: 'dashboard', label: 'Dashboard', icon: '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
+  { key: 'timeline', label: 'Timeline', icon: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' },
+  { key: 'budget', label: 'Budget Tracker', icon: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>' },
+  { key: 'guests', label: 'Guests', icon: '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4-4v2"/><circle cx="12" cy="7" r="4"/>' },
+  { key: 'rsvp', label: 'RSVP Tracker', icon: '<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>' },
+  { key: 'settings', label: 'Settings', icon: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>' }
+];
+
+var navKeyMap = ['navDashboard','navTimeline','navBudgetTracker','navGuests','navRsvpTracker','navSettings'];
+
+function buildSidebar() {
+  var html = '';
+  for (var i = 0; i < navItems.length; i++) {
+    var item = navItems[i];
+    html += '<div class="nav-item" data-section="' + item.key + '">';
+    html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + item.icon + '</svg>';
+    html += '<span>' + t(navKeyMap[i]) + '</span>';
+    html += '</div>';
+  }
+  document.getElementById('sidebarNav').innerHTML = html;
+  Array.from(document.querySelectorAll('.nav-item')).forEach(function(el) {
+    el.addEventListener('click', function() {
+      var section = el.getAttribute('data-section');
+      showSection(section);
+      closeSidebar();
+    });
+  });
+}
+
+var currentSection = 'dashboard';
+
+function showSection(name) {
+  var topTitle = document.getElementById('topbarTitle');
+  if (topTitle) topTitle.innerHTML = t('appTitle');
+  currentSection = name;
+  Array.from(document.querySelectorAll('.section')).forEach(function(el) {
+    el.classList.remove('active');
+  });
+  Array.from(document.querySelectorAll('.nav-item')).forEach(function(el) {
+    el.classList.remove('active');
+    if (el.getAttribute('data-section') === name) {
+      el.classList.add('active');
+    }
+  });
+  var secEl = document.getElementById('section-' + name);
+  if (secEl) secEl.classList.add('active');
+  if (sectionRenderers[name]) {
+    sectionRenderers[name]();
+  }
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('show');
+}
+
+// =============================================
+// SECTION RENDERERS
+// =============================================
+
+var countdownInterval = null;
+
+var sectionRenderers = {};
+
+// ---------- DASHBOARD ----------
+sectionRenderers.dashboard = function() {
+  renderDashboard();
+};
+
+function renderDashboard() {
+  if (countdownInterval) clearInterval(countdownInterval);
+
+  var sec = document.getElementById('section-dashboard');
+  var names = (appData.coupleName || t('couple')).split('&');
+  var name1 = esc((names[0] || '').trim());
+  var name2 = esc((names[1] || '').trim());
+  var dateStr = appData.weddingDate ? fmtDate(appData.weddingDate) : t('noDateSet');
+  var venue = esc(appData.venue || t('noVenue'));
+
+  var totalGuests = appData.guests.length;
+  var confirmed = 0;
+  var attending = 0;
+  var declined = 0;
+  var pending = 0;
+  var maybe = 0;
+  for (var i = 0; i < appData.guests.length; i++) {
+    var g = appData.guests[i];
+    var rs = (g.rsvp || 'pending').toLowerCase();
+    if (rs === 'attending') { attending++; confirmed++; }
+    else if (rs === 'declined') { declined++; }
+    else if (rs === 'maybe') { maybe++; }
+    else { pending++; }
+  }
+  var rsvpRate = totalGuests > 0 ? Math.round(((attending + declined) / totalGuests) * 100) : 0;
+  var tlDone = 0;
+  for (var i = 0; i < appData.timelineTasks.length; i++) {
+    if (appData.timelineTasks[i].done) tlDone++;
+  }
+  var tlTotal = appData.timelineTasks.length;
+
+  var html = '';
+
+  // Hero card
+  html += '<div class="hero-card">';
+  html += '<div class="hero-left">';
+  html += '<div class="hero-label">' + t('bigDay') + '</div>';
+  html += '<div class="hero-couple">' + name1 + ' <span class="amp">&</span> ' + name2 + '</div>';
+  html += '<div class="hero-date">' + dateStr + '</div>';
+  html += '<div class="hero-venue">📍 ' + venue + '</div>';
+  html += '</div>';
+  html += '<div class="hero-right" id="countdownArea">';
+  html += '<div class="countdown-box"><div class="num" id="cd-days">--</div><div class="unit">d</div></div>';
+  html += '<div class="countdown-divider"></div>';
+  html += '<div class="countdown-box"><div class="num" id="cd-hours">--</div><div class="unit">h</div></div>';
+  html += '<div class="countdown-divider"></div>';
+  html += '<div class="countdown-box"><div class="num" id="cd-mins">--</div><div class="unit">m</div></div>';
+  html += '<div class="countdown-divider"></div>';
+  html += '<div class="countdown-box"><div class="num" id="cd-secs">--</div><div class="unit">s</div></div>';
+  html += '</div>';
+  html += '</div>';
+
+  // Stats row
+  html += '<div class="stats-row">';
+  html += '<div class="card stat-card"><div class="stat-num">' + totalGuests + '</div><div class="stat-label">' + t('totalGuests') + '</div></div>';
+  html += '<div class="card stat-card"><div class="stat-num green">' + confirmed + '</div><div class="stat-label">' + t('confirmed') + '</div></div>';
+  html += '<div class="card stat-card"><div class="stat-num">' + rsvpRate + '%</div><div class="stat-label">' + t('rsvpRate') + '</div></div>';
+  html += '<div class="card stat-card"><div class="stat-num">' + tlDone + '/' + tlTotal + '</div><div class="stat-label">' + t('tasksDone') + '</div></div>';
+  html += '</div>';
+
+  // Bottom grid
+  html += '<div class="dashboard-grid">';
+
+  // Budget overview
+  html += '<div class="card">';
+  html += '<div class="card-header"><h3>' + t('budgetOverview') + '</h3><span class="subtitle">' + t('total') + ' ' + fmt$(appData.totalBudget) + '</span></div>';
+  var hasBudget = false;
+  for (var i = 0; i < appData.budgetCategories.length; i++) {
+    if (appData.budgetCategories[i].estimated > 0 || appData.budgetCategories[i].actual > 0) { hasBudget = true; break; }
+  }
+  if (!hasBudget) {
+    html += '<div class="empty-state"><div class="emoji">📊</div><p>' + t('noBudgetYet') + '</p></div>';
+  } else {
+    for (var i = 0; i < appData.budgetCategories.length; i++) {
+      var cat = appData.budgetCategories[i];
+      if (cat.estimated === 0 && cat.actual === 0) continue;
+      var estPct = appData.totalBudget > 0 ? Math.min((cat.estimated / appData.totalBudget) * 100, 100) : 0;
+      var actPct = appData.totalBudget > 0 ? Math.min((cat.actual / appData.totalBudget) * 100, 100) : 0;
+      var overClass = cat.actual > cat.estimated ? ' over' : '';
+      html += '<div class="budget-row">';
+      html += '<div class="name" title="' + t(budgetCatMap[cat.name] || cat.name) + '">' + t(budgetCatMap[cat.name] || cat.name) + '</div>';
+      html += '<div class="bars">';
+      html += '<div class="budget-bar"><div class="fill estimated" style="width:' + estPct + '%"></div></div>';
+      html += '<div class="budget-bar"><div class="fill actual' + overClass + '" style="width:' + actPct + '%"></div></div>';
+      html += '</div>';
+      html += '<div class="amounts">' + fmt$(cat.actual) + '</div>';
+      html += '</div>';
+    }
+  }
+  html += '</div>';
+
+  // RSVP summary
+  html += '<div class="card">';
+  html += '<div class="card-header"><h3>' + t('rsvpSummary') + '</h3><span class="subtitle">' + totalGuests + ' ' + t('invited') + '</span></div>';
+  if (totalGuests === 0) {
+    html += '<div class="empty-state"><div class="emoji">📋</div><p>' + t('noGuestsYet') + '</p></div>';
+  } else {
+    var rsvpData = [
+      { label: t('attending'), color: 'var(--green)', count: attending },
+      { label: t('pending'), color: 'var(--orange)', count: pending },
+      { label: t('declined'), color: 'var(--red)', count: declined },
+      { label: t('maybe'), color: '#9CA3AF', count: maybe }
+    ];
+    for (var i = 0; i < rsvpData.length; i++) {
+      var r = rsvpData[i];
+      var pct = totalGuests > 0 ? (r.count / totalGuests) * 100 : 0;
+      html += '<div class="rsvp-row">';
+      html += '<div class="dot" style="background:' + r.color + '"></div>';
+      html += '<div class="label">' + r.label + '</div>';
+      html += '<div class="bar-wrap"><div class="bar-fill" style="width:' + pct + '%;background:' + r.color + '"></div></div>';
+      html += '<div class="count">' + r.count + '</div>';
+      html += '</div>';
+    }
+  }
+  html += '</div>';
+
+  html += '</div>';
+
+  // Save on device bar (at the bottom)
+  var lastSaveStr = _lastSaveTime ? formatRelativeTime(_lastSaveTime) : t('never');
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 22px;border-radius:12px;background:linear-gradient(135deg,rgba(74,144,164,0.08),rgba(74,144,164,0.03));border:1px solid rgba(74,144,164,0.15);margin-top:32px;flex-wrap:wrap">';
+  html += '<div style="display:flex;align-items:center;gap:12px;flex:1;min-width:200px">';
+  html += '<div style="width:40px;height:40px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>';
+  html += '<div>';
+  html += '<div style="font-weight:700;font-size:0.9rem;color:var(--text)">' + t('saveOnDevice') + '</div>';
+  html += '<div style="font-size:0.78rem;color:var(--muted)">' + t('saveOnDeviceDesc') + '</div>';
+  html += '<div id="dashboardLastSaved" style="font-size:0.72rem;color:var(--accent);margin-top:2px;font-weight:500">' + t('lastSavedOn') + lastSaveStr + '</div>';
+  html += '</div></div>';
+  html += '<button id="dashboardSaveBtn" class="btn btn-primary" style="flex-shrink:0;padding:10px 22px;border-radius:10px;font-size:0.88rem;box-shadow:0 2px 8px rgba(74,144,164,0.25)">';
+  html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  html += t('saveOnDevice');
+  html += '</button>';
+  html += '</div>';
+
+  sec.innerHTML = html;
+
+  // Save on device button
+  var dashSaveBtn = document.getElementById('dashboardSaveBtn');
+  if (dashSaveBtn) {
+    dashSaveBtn.addEventListener('click', function() {
+      exportBackup();
+    });
+  }
+
+  // Countdown timer
+  function updateCountdown() {
+    if (!appData.weddingDate) return;
+    var now = new Date();
+    var target = new Date(appData.weddingDate + 'T00:00:00');
+    var diff = target.getTime() - now.getTime();
+    var daysEl = document.getElementById('cd-days');
+    var hoursEl = document.getElementById('cd-hours');
+    var minsEl = document.getElementById('cd-mins');
+    var secsEl = document.getElementById('cd-secs');
+    if (!daysEl) return;
+    if (diff <= 0) {
+      daysEl.textContent = '0';
+      hoursEl.textContent = '0';
+      minsEl.textContent = '0';
+      secsEl.textContent = '0';
+      return;
+    }
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor((diff % 86400000) / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    daysEl.textContent = d;
+    hoursEl.textContent = h;
+    minsEl.textContent = m;
+    secsEl.textContent = s;
+  }
+  updateCountdown();
+  countdownInterval = setInterval(updateCountdown, 1000);
+};
+
+// ---------- TIMELINE ----------
+sectionRenderers.timeline = function() {
+  renderTimeline();
+};
+
+function renderTimeline() {
+  var sec = document.getElementById('section-timeline');
+  var periodKeyMap = {
+    '12+ Months Out': 'tlPeriod12',
+    '9-12 Months Out': 'tlPeriod9',
+    '6-9 Months Out': 'tlPeriod6',
+    '4-6 Months Out': 'tlPeriod4',
+    '3-4 Months Out': 'tlPeriod3',
+    '2-3 Months Out': 'tlPeriod2',
+    '1-2 Months Out': 'tlPeriod1',
+    'Wedding Week': 'tlPeriodWeek'
+  };
+  var periodNames = ['12+ Months Out','9-12 Months Out','6-9 Months Out','4-6 Months Out','3-4 Months Out','2-3 Months Out','1-2 Months Out','Wedding Week'];
+  var periodKeyList = ['tlPeriod12','tlPeriod9','tlPeriod6','tlPeriod4','tlPeriod3','tlPeriod2','tlPeriod1','tlPeriodWeek'];
+
+  var totalDone = 0;
+  var totalTasks = appData.timelineTasks.length;
+  for (var i = 0; i < appData.timelineTasks.length; i++) {
+    if (appData.timelineTasks[i].done) totalDone++;
+  }
+  var pct = totalTasks > 0 ? Math.round((totalDone / totalTasks) * 100) : 0;
+
+  var html = '';
+  html += '<div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;"><div><h2>' + t('timelineTitle') + '</h2><p>' + t('timelineSub') + '</p></div><button class="btn btn-primary btn-sm" id="tlAddTaskBtn">+ ' + t('tlAddTask') + '</button></div>';
+
+  // Progress bar
+  html += '<div class="tl-progress card">';
+  html += '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
+  html += '<div class="progress-text">' + totalDone + ' ' + t('tasksOf') + ' ' + totalTasks + ' ' + t('timelineTitle').toLowerCase() + ' · ' + pct + '% ' + t('complete') + '</div>';
+  html += '</div>';
+
+  // Period cards
+  for (var pi = 0; pi < periodNames.length; pi++) {
+    var periodName = periodNames[pi];
+    var periodLabel = t(periodKeyList[pi]);
+    var periodDone = 0;
+    var periodTotal = 0;
+    for (var ti = 0; ti < appData.timelineTasks.length; ti++) {
+      if (appData.timelineTasks[ti].period === periodName) {
+        periodTotal++;
+        if (appData.timelineTasks[ti].done) periodDone++;
+      }
+    }
+    html += '<div class="card tl-period">';
+    html += '<div class="tl-period-header"><h4>' + esc(periodLabel) + '</h4><span class="count">' + periodDone + '/' + periodTotal + ' ' + t('complete') + '</span></div>';
+    for (var ti = 0; ti < appData.timelineTasks.length; ti++) {
+      var task = appData.timelineTasks[ti];
+      if (task.period !== periodName) continue;
+      var checkedClass = task.done ? ' checked' : '';
+      var isCustom = (task.text !== 'tlSetBudget' && task.text !== 'tlBookVenue' && task.text !== 'tlFinalWalkthrough');
+      var displayText = t(task.text);
+      if (task.custom) displayText = task.text;
+      html += '<div class="tl-task' + checkedClass + '" data-task-id="' + task.id + '">';
+      html += '<input type="checkbox"' + (task.done ? ' checked' : '') + '>';
+      html += '<span class="task-text">' + esc(displayText) + '</span>';
+      html += '<button class="task-delete" data-delete-task="' + task.id + '" title="' + t('tlDeleteTask') + '">&times;</button>';
+      html += '</div>';
+    }
+    html += '<div class="tl-add-task-row"><button class="btn btn-outline btn-sm" data-add-task-period="' + periodName + '">+ ' + t('tlAddTask') + '</button></div>';
+    html += '</div>';
+  }
+
+  // Notes Section
+  html += '<div style="margin-top:32px;"><div class="section-header"><h2>' + t('tlNotesTitle') + '</h2><p>' + t('tlNotesSub') + '</p></div>';
+  html += '<div class="card"><textarea id="tlNoteInput" placeholder="' + t('tlNoteText') + '" style="width:100%;min-height:70px;margin-bottom:12px;"></textarea>';
+  html += '<button class="btn btn-primary btn-sm" id="tlAddNoteBtn">' + t('tlAddNote') + '</button>';
+  if (appData.timelineNotes.length === 0) {
+    html += '<div class="empty-state" style="margin-top:12px;"><p>' + t('tlNoNotesYet') + '</p></div>';
+  } else {
+    html += '<div style="margin-top:16px;">';
+    for (var ni = appData.timelineNotes.length - 1; ni >= 0; ni--) {
+      var note = appData.timelineNotes[ni];
+      var noteTime = note.created ? fmtDate(note.created) : '';
+      html += '<div class="tl-note-card" data-note-id="' + note.id + '">';
+      html += '<button class="note-delete" data-delete-note="' + note.id + '" title="' + t('tlDeleteNote') + '">&times;</button>';
+      html += '<div class="tl-note-text">' + esc(note.text) + '</div>';
+      if (noteTime) html += '<div class="tl-note-time">' + noteTime + '</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div></div>';
+
+  sec.innerHTML = html;
+
+  // Add task button (top)
+  document.getElementById('tlAddTaskBtn').addEventListener('click', function() {
+    showAddTaskModal(null);
+  });
+
+  // Add task per period buttons
+  Array.from(sec.querySelectorAll('[data-add-task-period]')).forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var period = btn.getAttribute('data-add-task-period');
+      showAddTaskModal(period);
+    });
+  });
+
+  // Delete task buttons
+  Array.from(sec.querySelectorAll('[data-delete-task]')).forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var taskId = btn.getAttribute('data-delete-task');
+      if (confirm(t('tlDeleteTaskConfirm'))) {
+        for (var idx = 0; idx < appData.timelineTasks.length; idx++) {
+          if (appData.timelineTasks[idx].id === taskId) {
+            appData.timelineTasks.splice(idx, 1);
+            break;
+          }
+        }
+        saveData();
+        showToast(t('tlTaskDeleted'), 'success');
+        renderTimeline();
+      }
+    });
+  });
+
+  // Checkbox toggles
+  Array.from(sec.querySelectorAll('.tl-task')).forEach(function(el) {
+    var cb = el.querySelector('input[type="checkbox"]');
+    cb.addEventListener('change', function() {
+      var taskId = el.getAttribute('data-task-id');
+      for (var ci = 0; ci < appData.timelineTasks.length; ci++) {
+        if (appData.timelineTasks[ci].id === taskId) {
+          appData.timelineTasks[ci].done = cb.checked;
+          break;
+        }
+      }
+      saveData();
+      renderTimeline();
+    });
+  });
+
+  // Add note button
+  document.getElementById('tlAddNoteBtn').addEventListener('click', function() {
+    var input = document.getElementById('tlNoteInput');
+    var text = input.value.trim();
+    if (!text) {
+      input.style.borderColor = 'var(--red)';
+      return;
+    }
+    input.style.borderColor = '';
+    var today = new Date();
+    var dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    appData.timelineNotes.push({ id: generateId(), text: text, created: dateStr });
+    saveData();
+    showToast(t('tlNoteAdded'), 'success');
+    renderTimeline();
+  });
+
+  // Delete note buttons
+  Array.from(sec.querySelectorAll('[data-delete-note]')).forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var noteId = btn.getAttribute('data-delete-note');
+      if (confirm(t('tlDeleteNoteConfirm'))) {
+        for (var ni = 0; ni < appData.timelineNotes.length; ni++) {
+          if (appData.timelineNotes[ni].id === noteId) {
+            appData.timelineNotes.splice(ni, 1);
+            break;
+          }
+        }
+        saveData();
+        showToast(t('tlNoteDeleted'), 'success');
+        renderTimeline();
+      }
+    });
+  });
+}
+
+function showAddTaskModal(preselectedPeriod) {
+  var periodKeyList = ['tlPeriod12','tlPeriod9','tlPeriod6','tlPeriod4','tlPeriod3','tlPeriod2','tlPeriod1','tlPeriodWeek'];
+  var periodNames = ['12+ Months Out','9-12 Months Out','6-9 Months Out','4-6 Months Out','3-4 Months Out','2-3 Months Out','1-2 Months Out','Wedding Week'];
+  var html = '';
+  html += '<div class="modal-header"><h3>' + t('tlAddTaskTitle') + '</h3><button class="modal-close" id="modalCloseBtn">&times;</button></div>';
+  html += '<div class="form-group"><label>' + t('tlTaskText') + '</label><input type="text" id="newTaskText" placeholder="' + t('tlTaskText') + '"></div>';
+  html += '<div class="form-group"><label>' + t('tlTaskPeriod') + '</label><select id="newTaskPeriod">';
+  html += '<option value="">' + t('tlSelectPeriod') + '</option>';
+  for (var i = 0; i < periodNames.length; i++) {
+    var selected = (periodNames[i] === preselectedPeriod) ? ' selected' : '';
+    html += '<option value="' + periodNames[i] + '"' + selected + '>' + t(periodKeyList[i]) + '</option>';
+  }
+  html += '</select></div>';
+  html += '<div class="modal-actions"><button class="btn btn-outline" id="modalCancelBtn">' + t('cancel') + '</button><button class="btn btn-primary" id="modalSaveBtn">' + t('save') + '</button></div>';
+  showModal(html);
+
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+  document.getElementById('modalSaveBtn').addEventListener('click', function() {
+    var taskText = document.getElementById('newTaskText').value.trim();
+    var taskPeriod = document.getElementById('newTaskPeriod').value;
+    if (!taskText) {
+      document.getElementById('newTaskText').style.borderColor = 'var(--red)';
+      return;
+    }
+    if (!taskPeriod) {
+      document.getElementById('newTaskPeriod').style.borderColor = 'var(--red)';
+      return;
+    }
+    appData.timelineTasks.push({ id: generateId(), period: taskPeriod, text: taskText, custom: true, done: false });
+    saveData();
+    closeModal();
+    renderTimeline();
+  });
+}
+
+// ---------- GUESTS ----------
+sectionRenderers.guests = function() {
+  renderGuests();
+};
+
+function renderGuests() {
+  var sec = document.getElementById('section-guests');
+  var html = '';
+  html += '<div class="section-header"><h2>' + t('guestsTitle') + '</h2><p>' + t('guestsSub') + '</p></div>';
+
+  html += '<div class="filter-bar">';
+  html += '<input type="text" id="guestSearch" placeholder="' + t('searchName') + '">';
+  html += '<select id="guestTypeFilter"><option value="">' + t('allTypes') + '</option><option value="Guest">' + t('guest') + '</option><option value="Family">' + t('family') + '</option><option value="Officiant">' + t('officiant') + '</option></select>';
+  html += '<button class="btn btn-outline" id="guestAddBtn">+ ' + t('addGuest') + '</button>';
+  html += '</div>';
+
+  html += '<div class="table-wrap"><table id="guestTable">';
+  html += '<thead><tr><th>' + t('thName') + '</th><th>' + t('thType') + '</th><th>' + t('thContact') + '</th><th>' + t('thRsvp') + '</th><th>' + t('thMeal') + '</th><th>' + t('thPlusOne') + '</th><th>' + t('thActions') + '</th></tr></thead>';
+  html += '<tbody id="guestTableBody"></tbody>';
+  html += '</table></div>';
+
+  sec.innerHTML = html;
+
+  renderGuestsTable();
+
+  document.getElementById('guestAddBtn').addEventListener('click', function() {
+    showGuestFormModal('guests', null);
+  });
+  document.getElementById('guestSearch').addEventListener('input', function() {
+    renderGuestsTable();
+  });
+  document.getElementById('guestTypeFilter').addEventListener('change', function() {
+    renderGuestsTable();
+  });
+}
+
+function renderGuestsTable() {
+  var searchEl = document.getElementById('guestSearch');
+  var filterEl = document.getElementById('guestTypeFilter');
+  var search = searchEl ? searchEl.value.toLowerCase() : '';
+  var typeFilter = filterEl ? filterEl.value : '';
+  var tbody = document.getElementById('guestTableBody');
+  if (!tbody) return;
+
+  var html = '';
+  var count = 0;
+  for (var i = 0; i < appData.guests.length; i++) {
+    var g = appData.guests[i];
+    if (g.type === 'Bridesmaid' || g.type === 'Groomsman') continue;
+    if (typeFilter && g.type !== typeFilter) continue;
+    if (search && g.name.toLowerCase().indexOf(search) === -1) continue;
+    count++;
+    var meal = g.meal || t('none');
+    var plusOne = g.plusOne ? t('yes') : t('noOpt');
+    html += '<tr>';
+    html += '<td><strong>' + esc(g.name) + '</strong></td>';
+    html += '<td><span class="badge badge-' + (g.type || 'guest').toLowerCase() + '">' + esc(g.type || 'Guest') + '</span></td>';
+    html += '<td>' + esc(g.contact || '-') + '</td>';
+    html += '<td>' + rsvpBadge(g.rsvp || 'Pending') + '</td>';
+    html += '<td>' + esc(meal) + '</td>';
+    html += '<td>' + plusOne + '</td>';
+    html += '<td>';
+    html += '<button class="btn-icon guest-edit-btn" data-id="' + g.id + '" title="Edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
+    html += '<button class="btn-icon guest-del-btn" data-id="' + g.id + '" title="Delete" style="color:var(--red)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>';
+    html += '</td>';
+    html += '</tr>';
+  }
+  if (count === 0) {
+    html = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">' + t('noGuestsYetTable') + '</td></tr>';
+  }
+  tbody.innerHTML = html;
+
+  Array.from(tbody.querySelectorAll('.guest-edit-btn')).forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var id = btn.getAttribute('data-id');
+      showGuestFormModal('guests', id);
+    });
+  });
+  Array.from(tbody.querySelectorAll('.guest-del-btn')).forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var id = btn.getAttribute('data-id');
+      if (confirm(t('removeGuestConfirm'))) {
+        appData.guests = appData.guests.filter(function(g) { return g.id !== id; });
+        saveData();
+        renderGuestsTable();
+        showToast(t('guestRemoved'), 'info');
+      }
+    });
+  });
+}
+
+// ---------- GUEST FORM MODAL (shared) ----------
+function showGuestFormModal(source, editId) {
+  var isBridesmaid = (source === 'bridesmaids');
+  var guest = null;
+  if (editId) {
+    for (var i = 0; i < appData.guests.length; i++) {
+      if (appData.guests[i].id === editId) { guest = appData.guests[i]; break; }
+    }
+  }
+
+  var title = guest ? t('edit') : t('add');
+  title += isBridesmaid ? ' ' + t('addPartyMember').replace('+ ', '') : ' ' + t('addGuest').replace('+ ', '');
+
+  var typeOptions = isBridesmaid
+    ? '<option value="Bridesmaid"' + (!guest || guest.type === 'Bridesmaid' ? ' selected' : '') + '>' + t('bridesmaid') + '</option><option value="Groomsman"' + (guest && guest.type === 'Groomsman' ? ' selected' : '') + '>' + t('groomsman') + '</option>'
+    : '<option value="Guest"' + (!guest || guest.type === 'Guest' ? ' selected' : '') + '>' + t('guest') + '</option><option value="Family"' + (guest && guest.type === 'Family' ? ' selected' : '') + '>' + t('family') + '</option><option value="Officiant"' + (guest && guest.type === 'Officiant' ? ' selected' : '') + '>' + t('officiant') + '</option>';
+
+  var mealOptions = ['None','Chicken','Beef','Fish','Vegetarian','Vegan','Other'];
+  var mealKeys = ['none','mealChicken','mealBeef','mealFish','mealVegetarian','mealVegan','mealOther'];
+  var mealSelect = '';
+  for (var i = 0; i < mealOptions.length; i++) {
+    var sel = guest && guest.meal === mealOptions[i] ? ' selected' : '';
+    mealSelect += '<option value="' + mealOptions[i] + '"' + sel + '>' + t(mealKeys[i]) + '</option>';
+  }
+
+  var rsvpOptions = ['Pending','Attending','Declined','Maybe'];
+  var rsvpKeys = ['rsvpPending','rsvpAttending','rsvpDeclined','rsvpMaybe'];
+  var rsvpSelect = '';
+  for (var i = 0; i < rsvpOptions.length; i++) {
+    var sel = guest && guest.rsvp === rsvpOptions[i] ? ' selected' : '';
+    rsvpSelect += '<option value="' + rsvpOptions[i] + '"' + sel + '>' + t(rsvpKeys[i]) + '</option>';
+  }
+
+  var html = '';
+  html += '<div class="modal-header"><h3>' + title + '</h3><button class="modal-close" id="gfCloseBtn">&times;</button></div>';
+  html += '<div class="form-group"><label>' + t('name') + ' *</label><input type="text" id="gfName" value="' + esc(guest && guest.name ? guest.name : '') + '" required></div>';
+  html += '<div class="form-group"><label>' + t('type') + '</label><select id="gfType">' + typeOptions + '</select></div>';
+  html += '<div class="form-group"><label>' + t('contact') + '</label><input type="text" id="gfContact" value="' + esc(guest && guest.contact ? guest.contact : '') + '" placeholder="' + t('emailOrPhone') + '"></div>';
+  html += '<div class="form-group"><label>' + t('rsvp') + '</label><select id="gfRsvp">' + rsvpSelect + '</select></div>';
+  html += '<div class="form-group"><label>' + t('mealPreference') + '</label><select id="gfMeal">' + mealSelect + '</select></div>';
+  html += '<div class="form-group"><label class="checkbox-label"><input type="checkbox" id="gfPlusOne"' + (guest && guest.plusOne ? ' checked' : '') + '> ' + t('plusOne') + '</label></div>';
+  html += '<div class="form-group" id="gfPlusOneNameGroup" style="display:' + (guest && guest.plusOne ? 'block' : 'none') + '"><label>' + t('plusOneName') + '</label><input type="text" id="gfPlusOneName" value="' + esc(guest && guest.plusOneName ? guest.plusOneName : '') + '"></div>';
+  html += '<div class="form-group"><label>' + t('notesField') + '</label><textarea id="gfNotes">' + esc(guest && guest.notes ? guest.notes : '') + '</textarea></div>';
+  html += '<div class="form-error" id="gfError"></div>';
+  html += '<div class="modal-actions"><button class="btn btn-outline" id="gfCancelBtn">' + t('cancel') + '</button><button class="btn btn-primary" id="gfSaveBtn">' + t('save') + '</button></div>';
+
+  showModal(html);
+
+  var plusOneCb = document.getElementById('gfPlusOne');
+  plusOneCb.addEventListener('change', function() {
+    document.getElementById('gfPlusOneNameGroup').style.display = plusOneCb.checked ? 'block' : 'none';
+  });
+
+  document.getElementById('gfCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('gfCancelBtn').addEventListener('click', closeModal);
+  document.getElementById('gfSaveBtn').addEventListener('click', function() {
+    var name = document.getElementById('gfName').value.trim();
+    if (!name) {
+      document.getElementById('gfError').textContent = t('nameRequired');
+      document.getElementById('gfError').classList.add('show');
+      return;
+    }
+    var data = {
+      name: name,
+      type: document.getElementById('gfType').value,
+      contact: document.getElementById('gfContact').value.trim(),
+      rsvp: document.getElementById('gfRsvp').value,
+      meal: document.getElementById('gfMeal').value,
+      plusOne: document.getElementById('gfPlusOne').checked,
+      plusOneName: document.getElementById('gfPlusOneName').value.trim(),
+      notes: document.getElementById('gfNotes').value.trim()
+    };
+
+    if (guest) {
+      guest.name = data.name;
+      guest.type = data.type;
+      guest.contact = data.contact;
+      guest.rsvp = data.rsvp;
+      guest.meal = data.meal;
+      guest.plusOne = data.plusOne;
+      guest.plusOneName = data.plusOneName;
+      guest.notes = data.notes;
+    } else {
+      data.id = generateId();
+      appData.guests.push(data);
+    }
+    saveData();
+    closeModal();
+    renderGuests();
+    showToast(guest ? t('updated') : t('added'), 'success');
+  });
+}
+
+// ---------- RSVP TRACKER ----------
+sectionRenderers.rsvp = function() {
+  renderRsvpTracker();
+};
+
+function renderRsvpTracker() {
+  var sec = document.getElementById('section-rsvp');
+  var totalInvited = appData.guests.length;
+  var attending = 0, declined = 0, pending = 0, maybeCount = 0;
+  var mealCounts = { Chicken: 0, Beef: 0, Fish: 0, Vegetarian: 0, Vegan: 0, Other: 0 };
+
+  for (var i = 0; i < appData.guests.length; i++) {
+    var g = appData.guests[i];
+    var rs = (g.rsvp || 'pending').toLowerCase();
+    if (rs === 'attending') {
+      attending++;
+      if (g.plusOne) attending++;
+    }
+    else if (rs === 'declined') declined++;
+    else if (rs === 'maybe') maybeCount++;
+    else pending++;
+    var meal = g.meal || 'None';
+    if (mealCounts[meal] !== undefined) mealCounts[meal]++;
+  }
+
+  var html = '';
+  html += '<div class="section-header"><h2>' + t('rsvpTrackerTitle') + '</h2><p>' + t('rsvpTrackerSub') + '</p></div>';
+
+  // Stat cards
+  html += '<div class="stats-row" style="margin-bottom:24px">';
+  html += '<div class="card stat-card"><div class="stat-num">' + totalInvited + '</div><div class="stat-label">' + t('totalInvited') + '</div></div>';
+  html += '<div class="card stat-card"><div class="stat-num green">' + attending + '</div><div class="stat-label">' + t('attending') + '</div></div>';
+  html += '<div class="card stat-card"><div class="stat-num" style="color:var(--red)">' + declined + '</div><div class="stat-label">' + t('declined') + '</div></div>';
+  html += '<div class="card stat-card"><div class="stat-num" style="color:var(--orange)">' + pending + '</div><div class="stat-label">' + t('pending') + '</div></div>';
+  html += '</div>';
+
+  // Meal Summary
+  html += '<div class="card" style="margin-bottom:20px">';
+  html += '<div class="card-header"><h3>' + t('mealSummary') + '</h3></div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px">';
+  var mealLabels = ['Chicken','Beef','Fish','Vegetarian','Vegan','Other'];
+  var mealLabelKeys = ['mealChicken','mealBeef','mealFish','mealVegetarian','mealVegan','mealOther'];
+  for (var i = 0; i < mealLabels.length; i++) {
+    html += '<div style="text-align:center;padding:12px;background:var(--bg);border-radius:8px">';
+    html += '<div style="font-size:1.3rem;font-weight:700;color:var(--accent)">' + mealCounts[mealLabels[i]] + '</div>';
+    html += '<div style="font-size:0.78rem;color:var(--muted)">' + t(mealLabelKeys[i]) + '</div>';
+    html += '</div>';
+  }
+  html += '</div></div>';
+
+  // Overdue follow-ups
+  if (appData.weddingDate) {
+    var now = new Date();
+    var wedding = new Date(appData.weddingDate + 'T00:00:00');
+    var daysUntil = Math.ceil((wedding.getTime() - now.getTime()) / 86400000);
+    if (daysUntil <= 30 && daysUntil > 0) {
+      var overdueList = [];
+      for (var i = 0; i < appData.guests.length; i++) {
+        var g = appData.guests[i];
+        var rs = (g.rsvp || 'pending').toLowerCase();
+        if (rs === 'pending' || rs === 'maybe') overdueList.push(g);
+      }
+      if (overdueList.length > 0) {
+        html += '<div class="card" style="border-color:rgba(239,68,68,0.3);margin-bottom:20px">';
+        html += '<div class="card-header"><h3 style="color:var(--red)">⚠ ' + t('overdueFollowUps') + '</h3><span class="subtitle">' + daysUntil + ' ' + t('daysUntilWedding') + '</span></div>';
+        for (var i = 0; i < overdueList.length; i++) {
+          html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F3F4F6">';
+          html += '<span>' + esc(overdueList[i].name) + '</span>';
+          html += rsvpBadge(overdueList[i].rsvp || 'Pending');
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+    }
+  }
+
+  // Details table
+  html += '<div class="filter-bar">';
+  html += '<select id="rsvpFilter"><option value="">' + t('allFilter') + '</option><option value="Pending">' + t('rsvpPending') + '</option><option value="Attending">' + t('rsvpAttending') + '</option><option value="Declined">' + t('rsvpDeclined') + '</option><option value="Maybe">' + t('rsvpMaybe') + '</option></select>';
+  html += '</div>';
+
+  html += '<div class="table-wrap"><table id="rsvpTable">';
+  html += '<thead><tr><th>' + t('thName') + '</th><th>' + t('thRsvp') + '</th><th>' + t('thMeal') + '</th><th>' + t('thPlusOne') + '</th><th>' + t('thContact') + '</th></tr></thead>';
+  html += '<tbody id="rsvpTableBody"></tbody>';
+  html += '</table></div>';
+
+  sec.innerHTML = html;
+
+  renderRsvpTable();
+
+  document.getElementById('rsvpFilter').addEventListener('change', function() {
+    renderRsvpTable();
+  });
+}
+
+function renderRsvpTable() {
+  var filterEl = document.getElementById('rsvpFilter');
+  var filterVal = filterEl ? filterEl.value : '';
+  var tbody = document.getElementById('rsvpTableBody');
+  if (!tbody) return;
+
+  var html = '';
+  var count = 0;
+  for (var i = 0; i < appData.guests.length; i++) {
+    var g = appData.guests[i];
+    if (filterVal && (g.rsvp || 'Pending') !== filterVal) continue;
+    count++;
+    html += '<tr>';
+    html += '<td><strong>' + esc(g.name) + '</strong></td>';
+    html += '<td>' + rsvpBadge(g.rsvp || 'Pending') + '</td>';
+    html += '<td>' + esc(g.meal || 'None') + '</td>';
+    html += '<td>' + (g.plusOne ? (esc(g.plusOneName) || t('yes')) : t('noOpt')) + '</td>';
+    html += '<td>' + esc(g.contact || '-') + '</td>';
+    html += '</tr>';
+  }
+  if (count === 0) {
+    html = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted)">' + t('noMatchingGuests') + '</td></tr>';
+  }
+  tbody.innerHTML = html;
+}
+
+// ---------- BUDGET TRACKER ----------
+sectionRenderers.budget = function() {
+  renderBudgetTracker();
+};
+
+function renderBudgetTracker() {
+  var sec = document.getElementById('section-budget');
+  var totalEst = 0, totalAct = 0;
+  for (var i = 0; i < appData.budgetCategories.length; i++) {
+    totalEst += appData.budgetCategories[i].estimated || 0;
+    totalAct += appData.budgetCategories[i].actual || 0;
+  }
+  var remaining = appData.totalBudget - totalAct;
+  var spentPct = appData.totalBudget > 0 ? (totalAct / appData.totalBudget) * 100 : 0;
+  var overBudget = spentPct > 100;
+
+  var html = '';
+  html += '<div class="section-header"><h2>' + t('budgetTrackerTitle') + '</h2><p>' + t('budgetTrackerSub') + '</p></div>';
+
+  // Stat cards
+  html += '<div class="stats-row" style="margin-bottom:24px">';
+  html += '<div class="card stat-card"><div class="stat-num">' + fmt$(appData.totalBudget) + '</div><div class="stat-label">' + t('totalBudgetLabel') + '</div></div>';
+  html += '<div class="card stat-card"><div class="stat-num" style="color:' + (overBudget ? 'var(--red)' : 'var(--text)') + '">' + fmt$(totalAct) + '</div><div class="stat-label">' + t('totalSpent') + '</div></div>';
+  html += '<div class="card stat-card"><div class="stat-num" style="color:' + (remaining < 0 ? 'var(--red)' : 'var(--green)') + '">' + fmt$(remaining) + '</div><div class="stat-label">' + t('remaining') + '</div></div>';
+  html += '</div>';
+
+  // Progress bar
+  html += '<div class="card" style="margin-bottom:20px">';
+  html += '<div class="progress-bar" style="height:10px;margin-bottom:6px"><div class="progress-fill' + (overBudget ? ' red' : '') + '" style="width:' + Math.min(spentPct, 100) + '%"></div></div>';
+  html += '<div style="font-size:0.85rem;color:var(--muted)">' + spentPct.toFixed(1) + t('ofBudgetUsed') + '</div>';
+  html += '</div>';
+
+  // Table
+  html += '<div class="table-wrap"><table>';
+  html += '<thead><tr><th>' + t('category') + '</th><th>' + t('estimated') + '</th><th>' + t('actual') + '</th><th>' + t('difference') + '</th><th>' + t('thActions') + '</th></tr></thead>';
+  html += '<tbody>';
+  for (var i = 0; i < appData.budgetCategories.length; i++) {
+    var cat = appData.budgetCategories[i];
+    var diff = cat.estimated - cat.actual;
+    var diffClass = diff < 0 ? 'color:var(--red)' : 'color:var(--green)';
+    html += '<tr>';
+    html += '<td><strong>' + t(budgetCatMap[cat.name] || cat.name) + '</strong></td>';
+    html += '<td>' + fmt$(cat.estimated) + '</td>';
+    html += '<td>' + fmt$(cat.actual) + '</td>';
+    html += '<td style="' + diffClass + ';font-weight:600">' + fmt$(Math.abs(diff)) + ' ' + (diff < 0 ? t('over') : t('under')) + '</td>';
+    html += '<td><button class="btn-icon budget-edit-btn" data-id="' + cat.id + '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></td>';
+    html += '</tr>';
+  }
+  // Total row
+  var totalDiff = totalEst - totalAct;
+  var totalDiffClass = totalDiff < 0 ? 'color:var(--red)' : 'color:var(--green)';
+  html += '<tr style="background:var(--bg);font-weight:700">';
+  html += '<td>' + t('total') + '</td>';
+  html += '<td>' + fmt$(totalEst) + '</td>';
+  html += '<td>' + fmt$(totalAct) + '</td>';
+  html += '<td style="' + totalDiffClass + '">' + fmt$(Math.abs(totalDiff)) + ' ' + (totalDiff < 0 ? t('over') : t('under')) + '</td>';
+  html += '<td></td>';
+  html += '</tr>';
+  html += '</tbody></table></div>';
+
+  sec.innerHTML = html;
+
+  Array.from(sec.querySelectorAll('.budget-edit-btn')).forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var id = btn.getAttribute('data-id');
+      var cat = null;
+      for (var i = 0; i < appData.budgetCategories.length; i++) {
+        if (appData.budgetCategories[i].id === id) { cat = appData.budgetCategories[i]; break; }
+      }
+      if (!cat) return;
+      var html = '';
+      html += '<div class="modal-header"><h3>' + t('edit') + ': ' + t(budgetCatMap[cat.name] || cat.name) + '</h3><button class="modal-close" id="beCloseBtn">&times;</button></div>';
+      html += '<div class="form-group"><label>' + t('estimated') + '</label><input type="number" id="beEst" value="' + (cat.estimated || 0) + '" min="0" step="0.01"></div>';
+      html += '<div class="form-group"><label>' + t('actual') + '</label><input type="number" id="beAct" value="' + (cat.actual || 0) + '" min="0" step="0.01"></div>';
+      html += '<div class="modal-actions"><button class="btn btn-outline" id="beCancelBtn">' + t('cancel') + '</button><button class="btn btn-primary" id="beSaveBtn">' + t('save') + '</button></div>';
+      showModal(html);
+
+      document.getElementById('beCloseBtn').addEventListener('click', closeModal);
+      document.getElementById('beCancelBtn').addEventListener('click', closeModal);
+      document.getElementById('beSaveBtn').addEventListener('click', function() {
+        cat.estimated = parseFloat(document.getElementById('beEst').value) || 0;
+        cat.actual = parseFloat(document.getElementById('beAct').value) || 0;
+        saveData();
+        closeModal();
+        renderBudgetTracker();
+        showToast(t('budgetUpdated'), 'success');
+      });
+    });
+  });
+}
+
+// ---------- SETTINGS ----------
+sectionRenderers.settings = function() {
+  renderSettings();
+};
+
+function renderSettings() {
+  var sec = document.getElementById('section-settings');
+  var html = '';
+  html += '<div class="section-header"><h2>' + t('settingsTitle') + '</h2><p>' + t('settingsSub') + '</p></div>';
+
+  // Language
+  html += '<div class="card settings-card">';
+  html += '<h3>' + t('language') + '</h3>';
+  html += '<div class="settings-row"><span class="sr-label">' + t('language') + '</span><select id="langSelectSettings" style="padding:6px 12px;border:1px solid var(--border);border-radius:8px;font-size:0.9rem;color:var(--text);background:var(--card);outline:none;"><option value="en"' + (currentLang === 'en' ? ' selected' : '') + '>English</option><option value="fr"' + (currentLang === 'fr' ? ' selected' : '') + '>Fran&ccedil;ais</option><option value="es"' + (currentLang === 'es' ? ' selected' : '') + '>Espa&ntilde;ol</option><option value="de"' + (currentLang === 'de' ? ' selected' : '') + '>Deutsch</option><option value="nl"' + (currentLang === 'nl' ? ' selected' : '') + '>Nederlands</option></select></div>';
+  html += '</div>';
+
+  // Wedding Details
+  html += '<div class="card settings-card">';
+  html += '<h3>' + t('weddingDetails') + '</h3>';
+  html += '<div class="settings-row"><span class="sr-label">' + t('coupleNames') + '</span><span class="sr-value">' + esc(appData.coupleName || t('notSet')) + '</span></div>';
+  html += '<div class="settings-row"><span class="sr-label">' + t('weddingDate') + '</span><span class="sr-value">' + fmtDate(appData.weddingDate) + '</span></div>';
+  html += '<div class="settings-row"><span class="sr-label">' + t('venueSetting') + '</span><span class="sr-value">' + esc(appData.venue || t('notSet')) + '</span></div>';
+  html += '<div class="settings-row"><span class="sr-label">' + t('totalBudgetLabel') + '</span><span class="sr-value">' + fmt$(appData.totalBudget) + '</span></div>';
+  html += '<div style="margin-top:12px"><button class="btn btn-outline" id="settingsEditBtn">' + t('editDetails') + '</button></div>';
+  html += '</div>';
+
+  // Data Health
+  var lastSaveStr = _lastSaveTime ? formatRelativeTime(_lastSaveTime) : t('never');
+  var lastBackup = localStorage.getItem('weddingPlannerLastBackup');
+  var lastBackupStr = lastBackup ? formatRelativeTime(parseInt(lastBackup, 10)) : t('never');
+  html += '<div class="card settings-card">';
+  html += '<h3>' + t('dataHealth') + '</h3>';
+  html += '<div class="settings-row"><span class="sr-label">' + t('lastSaved') + '</span><span class="sr-value" id="settingsLastSaved">' + lastSaveStr + '</span></div>';
+  html += '<div class="settings-row"><span class="sr-label">' + t('lastBackup') + '</span><span class="sr-value">' + lastBackupStr + '</span></div>';
+  html += '</div>';
+
+  // Data Management
+  html += '<div class="card settings-card">';
+  html += '<h3>' + t('dataManagement') + '</h3>';
+  html += '<div style="display:flex;gap:12px;flex-wrap:wrap">';
+  html += '<button class="btn btn-outline" id="exportBtn">' + t('exportData') + '</button>';
+  html += '<button class="btn btn-outline" id="importBtn">' + t('importData') + '</button>';
+  html += '<input type="file" id="importFileInput" accept=".json" style="display:none">';
+  html += '</div>';
+  html += '</div>';
+
+  // Danger Zone
+  html += '<div class="danger-zone">';
+  html += '<h3>' + t('dangerZone') + '</h3>';
+  html += '<p>' + t('dangerZoneText') + '</p>';
+  html += '<button class="btn btn-danger" id="resetBtn">' + t('resetAllData') + '</button>';
+  html += '</div>';
+
+  sec.innerHTML = html;
+
+  // Language selector
+  document.getElementById('langSelectSettings').addEventListener('change', function() {
+    setLanguage(this.value);
+    renderSettings();
+  });
+
+  // Edit details
+  document.getElementById('settingsEditBtn').addEventListener('click', function() {
+    showSettingsEditModal();
+  });
+
+  // Export
+  document.getElementById('exportBtn').addEventListener('click', function() {
+    exportBackup();
+  });
+
+  // Import
+  var importInput = document.getElementById('importFileInput');
+  document.getElementById('importBtn').addEventListener('click', function() {
+    importInput.click();
+  });
+  importInput.addEventListener('change', function() {
+    var file = importInput.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var imported = JSON.parse(e.target.result);
+        appData = Object.assign({}, defaultData, imported);
+        if (!appData.budgetCategories || appData.budgetCategories.length === 0) {
+          appData.budgetCategories = buildDefaultBudget();
+        }
+        if (!appData.timelineTasks || appData.timelineTasks.length === 0) {
+          appData.timelineTasks = buildDefaultTimeline();
+        }
+        if (!appData.honeymoon) {
+              }
+        if (!appData.honeymoon.packingList) appData.honeymoon.packingList = [];
+        if (!appData.honeymoon.itinerary) appData.honeymoon.itinerary = [];
+        appData.setupComplete = true;
+        saveData();
+            buildSidebar();
+        showSection(currentSection);
+        showToast(t('dataImported'), 'success');
+      } catch (err) {
+        showToast(t('invalidFileFormat'), 'error');
+      }
+    };
+    reader.readAsText(file);
+    importInput.value = '';
+  });
+
+  // Reset
+  document.getElementById('resetBtn').addEventListener('click', function() {
+    var html = '';
+    html += '<div class="modal-header"><h3>' + t('resetAllData') + '</h3><button class="modal-close" id="resetCloseBtn">&times;</button></div>';
+    html += '<p style="margin-bottom:20px;color:var(--muted)">' + t('resetModalText') + '</p>';
+    html += '<div class="modal-actions"><button class="btn btn-outline" id="resetCancelBtn">' + t('cancel') + '</button><button class="btn btn-danger" id="resetConfirmBtn">' + t('resetEverything') + '</button></div>';
+    showModal(html);
+
+    document.getElementById('resetCloseBtn').addEventListener('click', closeModal);
+    document.getElementById('resetCancelBtn').addEventListener('click', closeModal);
+    document.getElementById('resetConfirmBtn').addEventListener('click', function() {
+      localStorage.removeItem('weddingPlannerData');
+      appData = Object.assign({}, defaultData);
+      closeModal();
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('welcome').style.display = 'flex';
+      if (countdownInterval) clearInterval(countdownInterval);
+      showToast(t('dataReset'), 'info');
+    });
+  });
+}
+
+function showSettingsEditModal() {
+  var html = '';
+  html += '<div class="modal-header"><h3>' + t('editWeddingDetails') + '</h3><button class="modal-close" id="seCloseBtn">&times;</button></div>';
+  html += '<div class="form-group"><label>' + t('coupleNames') + '</label><div class="input-group"><span class="prefix">💕</span><input type="text" id="seCouple" value="' + esc(appData.coupleName || '') + '"></div></div>';
+  html += '<div class="form-group"><label>' + t('weddingDate') + '</label><div class="input-group"><span class="prefix">📅</span><input type="date" id="seDate" value="' + (appData.weddingDate || '') + '"></div></div>';
+  html += '<div class="form-group"><label>' + t('venueSetting') + '</label><div class="input-group"><span class="prefix">📍</span><input type="text" id="seVenue" value="' + esc(appData.venue || '') + '"></div></div>';
+  html += '<div class="form-group"><label>' + t('totalBudgetLabel') + '</label><div class="input-group"><span class="prefix">$</span><input type="number" id="seBudget" value="' + (appData.totalBudget || 0) + '" min="0"></div></div>';
+
+  html += '<div class="form-error" id="seError"></div>';
+  html += '<div class="modal-actions"><button class="btn btn-outline" id="seCancelBtn">' + t('cancel') + '</button><button class="btn btn-primary" id="seSaveBtn">' + t('save') + '</button></div>';
+
+  showModal(html);
+
+  document.getElementById('seCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('seCancelBtn').addEventListener('click', closeModal);
+  document.getElementById('seSaveBtn').addEventListener('click', function() {
+    var couple = document.getElementById('seCouple').value.trim();
+    if (!couple) {
+      document.getElementById('seError').textContent = t('coupleNamesRequired');
+      document.getElementById('seError').classList.add('show');
+      return;
+    }
+    appData.coupleName = couple;
+    appData.weddingDate = document.getElementById('seDate').value;
+    appData.venue = document.getElementById('seVenue').value.trim();
+    appData.totalBudget = parseFloat(document.getElementById('seBudget').value) || 0;
+    saveData();
+    closeModal();
+    renderSettings();
+    showToast(t('detailsUpdated'), 'success');
+  });
+}
+
+// =============================================
+// INITIALIZATION
+// =============================================
+
+function initBackupReminder() {
+  var banner = document.getElementById('backupReminderBanner');
+  if (!banner) return;
+
+  var lastExport = localStorage.getItem('weddingPlannerLastBackup');
+  var lastDismissed = localStorage.getItem('weddingPlannerReminderDismissed');
+  var now = Date.now();
+  var sevenDays = 7 * 24 * 60 * 60 * 1000;
+  var oneDay = 24 * 60 * 60 * 1000;
+
+  // Show reminder if: never exported and 3 days since setup, or 7+ days since last export
+  // Don't show if dismissed within last 24 hours
+  var shouldShow = false;
+  if (lastDismissed && (now - parseInt(lastDismissed, 10)) < oneDay) {
+    shouldShow = false;
+  } else if (!lastExport) {
+    var setupTime = parseInt(localStorage.getItem('weddingPlannerLastSaved') || '0', 10);
+    if (setupTime && (now - setupTime) > 3 * oneDay) shouldShow = true;
+  } else if ((now - parseInt(lastExport, 10)) > sevenDays) {
+    shouldShow = true;
+  }
+
+  if (shouldShow) {
+    banner.style.display = 'flex';
+    document.getElementById('backupReminderText').innerHTML = '📦 ' + t('backupReminderText');
+    document.getElementById('backupExportBtn').textContent = t('backupExportNow');
+    document.getElementById('backupDismissBtn').textContent = t('backupDismiss');
+  }
+
+  document.getElementById('backupExportBtn').addEventListener('click', function() {
+    exportBackup();
+    banner.style.display = 'none';
+  });
+
+  document.getElementById('backupDismissBtn').addEventListener('click', function() {
+    banner.style.display = 'none';
+    localStorage.setItem('weddingPlannerReminderDismissed', String(Date.now()));
+  });
+}
+
+function exportBackup() {
+  var dataStr = JSON.stringify(appData, null, 2);
+  var blob = new Blob([dataStr], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  var coupleSlug = (appData.coupleName || 'MyWedding').replace(/[^a-zA-Z0-9\s&]/g, '').replace(/\s+/g, '_').trim();
+  var saveDate = new Date().toISOString().slice(0,10);
+  a.download = coupleSlug + '_' + saveDate + '_MyWeddingPlanner.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  localStorage.setItem('weddingPlannerLastBackup', String(Date.now()));
+  showToast(t('dataExported'), 'success');
+}
+
+// Update the relative time display every 30 seconds
+setInterval(function() {
+  updateSaveIndicator();
+}, 30000);
+
+function initApp() {
+  loadData();
+
+  // Restore last saved time
+  var savedTs = localStorage.getItem('weddingPlannerLastSaved');
+  if (savedTs) _lastSaveTime = parseInt(savedTs, 10);
+
+  if (appData.setupComplete) {
+    document.getElementById('welcome').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    buildSidebar();
+    var topTitle = document.getElementById('topbarTitle');
+    if (topTitle) topTitle.innerHTML = t('appTitle');
+    showSection('dashboard');
+    updateSaveIndicator();
+    initBackupReminder();
+  } else {
+    document.getElementById('welcome').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    initWelcomeForm();
+  }
+
+  // Language selector on welcome screen
+  var langSelect = document.getElementById('langSelectWelcome');
+  if (langSelect) {
+    langSelect.value = currentLang;
+    langSelect.addEventListener('change', function() {
+      var newLang = langSelect.value;
+      setLanguage(newLang);
+      var langLbl = document.getElementById('langLabel');
+      if (langLbl) langLbl.textContent = t('language');
+      var wTitle = document.querySelector('.welcome-title');
+      if (wTitle) wTitle.textContent = t('welcomeTitle');
+      var wSub = document.querySelector('.welcome-sub');
+      if (wSub) wSub.textContent = t('welcomeSub');
+      var cLabel = document.querySelector('#setupForm .welcome-section:first-child h3');
+      if (cLabel) cLabel.textContent = t('couple');
+      var edLabel = document.querySelector('#setupForm .welcome-section:nth-child(2) h3');
+      if (edLabel) edLabel.textContent = t('eventDetails');
+      var bLabel = document.querySelector('#setupForm .welcome-section:nth-child(3) h3');
+      if (bLabel) bLabel.textContent = t('budget');
+      var subBtn = document.querySelector('.welcome-submit');
+      if (subBtn) subBtn.textContent = t('letsStart');
+    });
+  }
+
+  // Hamburger
+  document.getElementById('hamburgerBtn').addEventListener('click', function() {
+    var sidebar = document.getElementById('sidebar');
+    if (sidebar.classList.contains('open')) {
+      closeSidebar();
+    } else {
+      openSidebar();
+    }
+  });
+
+  // Sidebar overlay
+  document.getElementById('sidebarOverlay').addEventListener('click', function() {
+    closeSidebar();
+  });
+
+  // Modal overlay close
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === document.getElementById('modalOverlay')) {
+      closeModal();
+    }
+  });
+
+  // Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeModal();
+      closeSidebar();
+    }
+  });
+}
+
+function initWelcomeForm() {
+  document.getElementById('setupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Clear errors
+    document.getElementById('err-couple').classList.remove('show');
+    document.getElementById('err-date').classList.remove('show');
+    document.getElementById('err-venue').classList.remove('show');
+    document.getElementById('err-budget').classList.remove('show');
+    document.getElementById('err-couple').textContent = '';
+    document.getElementById('err-date').textContent = '';
+    document.getElementById('err-venue').textContent = '';
+    document.getElementById('err-budget').textContent = '';
+
+    var couple = document.querySelector('[name="coupleName"]').value.trim();
+    var date = document.querySelector('[name="weddingDate"]').value;
+    var venue = document.querySelector('[name="venue"]').value.trim();
+    var budget = parseFloat(document.querySelector('[name="totalBudget"]').value);
+
+    var valid = true;
+
+    if (!couple) {
+      document.getElementById('err-couple').textContent = t('errCoupleRequired');
+      document.getElementById('err-couple').classList.add('show');
+      valid = false;
+    }
+
+    if (!date) {
+      document.getElementById('err-date').textContent = t('errDateRequired');
+      document.getElementById('err-date').classList.add('show');
+      valid = false;
+    } else {
+      var d = new Date(date + 'T00:00:00');
+      if (isNaN(d.getTime())) {
+        document.getElementById('err-date').textContent = t('invalidDate');
+        document.getElementById('err-date').classList.add('show');
+        valid = false;
+      }
+    }
+
+    if (!venue) {
+      document.getElementById('err-venue').textContent = t('errVenueRequired');
+      document.getElementById('err-venue').classList.add('show');
+      valid = false;
+    }
+
+    if (!budget || budget <= 0 || isNaN(budget)) {
+      document.getElementById('err-budget').textContent = t('errBudgetRequired');
+      document.getElementById('err-budget').classList.add('show');
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    appData.coupleName = couple;
+    appData.weddingDate = date;
+    appData.venue = venue;
+    appData.totalBudget = budget;
+    appData.setupComplete = true;
+    appData.budgetCategories = buildDefaultBudget();
+    appData.timelineTasks = buildDefaultTimeline();
+    appData.guests = [];
+
+    saveData();
+
+    document.getElementById('welcome').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    buildSidebar();
+    showSection('dashboard');
+  });
+}
+
+// Start
+document.addEventListener('DOMContentLoaded', function() {
+  initApp();
+});
+</script>
+</body>
+</html>
